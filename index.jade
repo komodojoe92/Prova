@@ -9,6 +9,7 @@ script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
 script(src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js')
 script(src='https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js')
 script(src='https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js')
+script(src='https://www.google.com/jsapi')
     script.
       var tagList=[];
       var searchCamp="";
@@ -49,7 +50,7 @@ script(src='https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/d
         if((tagList.length == undefined) || (tagList.length == 0)){
           string = "/keys/"+searchCamp;
           $.getJSON('http://blackarachnia.ingm.ad:49161'+string, function(data){
-          showTable(data);
+          showTableChart(data);
           })
         }
         else{
@@ -60,12 +61,12 @@ script(src='https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/d
           string = string.substring(0, string.length-3);
           $.getJSON('http://blackarachnia.ingm.ad:49161'+ string +'/keys/'+ searchCamp, function(data){
           console.log(data);
-          showTable(data);
+          showTableChart(data);
           })
         }
       }
 
-      function showTable(obj){
+      function showTableChart(obj){
         var pippo="";
         var hash = new Object();
         var array;
@@ -121,6 +122,55 @@ script(src='https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/d
             "columns": papa[count],
           });
           count++;
+        }
+        var arrayNaN=[];
+        var supportoNaN=[];
+        var indexGene;
+        var rows=[];
+        var material=[];
+        var dati=[];
+        for(i=0 ; i<papa.length ; i++){
+          arrayNaN=[];
+          for(k=0 ; k<hash[Object.keys(hash)[i]][0].length ; k++){
+            supportoNaN=[];
+            if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_short_name")==-1)){
+              supportoNaN.push(k);
+            }
+            else if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_short_name")!=-1)){
+              indexGene = k;
+            }
+          }
+          arrayNaN.push(supportoNaN);  
+          google.load('visualization', '1', {packages: ['corechart', 'bar']});
+          google.setOnLoadCallback(drawCharts);  
+          
+          function drawCharts(){
+            for(i=0 ; i<papa.length ; i++){
+              dati[i] = new google.visualization.DataTable();
+              dati[i].addColumn('string', String(papa[i][indexGene]['title'])); 
+              for(j=0 ; j<papa[i].length ; j++){
+                if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_short_name")==-1)){
+                  dati[i].addColumn('number', String(papa[i][j]['title']));
+                }
+              }
+              for(j=0 ; j<hash[Object.keys(hash)[i]].length ; j++){
+                rows=[];
+                rows.push(hash[Object.keys(hash)[i]][j][indexGene]);
+                for(k=0 ; k<hash[Object.keys(hash)[i]][j].length ; k++){
+                  if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_short_name")==-1)){
+                    rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
+                  }
+                }
+                dati[i].addRow(rows);
+              }
+              var options = {
+                height: 300,
+                width: 600,     
+              };
+              charts[i] = new google.charts.Bar(document.getElementById('chart_'+i));
+              charts[i].draw(dati[i], options);
+            }
+          }
         }
         $('.myChart').hide();
         $('.myTable').show();
