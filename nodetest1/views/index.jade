@@ -9,11 +9,12 @@ html
     script(src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js')
     script(src='https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js')
     script(src='https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js')
+    script(src='https://www.google.com/jsapi')
     script.
-      var tagList=[];
-      var searchCamp="";
+      var tagList=[];   //lista dei tag che vengono selezionati
+      var searchCamp="";    //stringa di ricerca data in input
 
-      $(document).ready(function() {
+      $(document).ready(function() {    //contata il server e rstituisce il vettore dei tag IN JSON, per ciascun tag crea un bottone all'interno di #listingTag_Body
         $.getJSON('http://blackarachnia.ingm.ad:49161/tags', function(data){
           $.each(data, function(index,value){
             $("<div class=\"btn btn-default\" id=\""+ value +"\" style=\"margin-bottom:12px;margin-left:12px;\" onclick=\"selectionTag(id)\">" + value +"</div>").appendTo('#listingTag_Body');
@@ -21,84 +22,85 @@ html
         })
       });
 
-      function deleteTag(idBtn){
+      function deleteTag(idBtn){    //quando clicco su un bottone già selezionato oppure cancello una voce dalla lista tag con l'apposito bottone, cancella la voce da tagList e il bottone viene deselezionato
       $('#line_'+ idBtn.split("_")[1]).remove();
       $('#'+idBtn.split("_")[1]).css("background-color", "");
       tagList.splice(tagList.indexOf(idBtn.split("_")[1]),tagList.indexOf(idBtn.split("_")[1])+1);
       }
       
-      function sendList(){
+      function sendList(){    //setta tutte le variabili utili alla funzione e svuota tutti i campi in Result
         searchCamp="";
         var string="";
         $('#sectionResult_body_Tab').empty();
         $('#sectionResult_body_Content').empty();
         $('#SelectedFile_Body').empty();
-        if ($('#globalSearchForm').val() != ""){
-          var inputSplit = $('#globalSearchForm').val().split(" ")
-          $.each(inputSplit, function(){
+        if ($('#globalSearchForm').val() != ""){    //controlla che ci sia una stringa in input
+          var inputSplit = $('#globalSearchForm').val().split(" ");    //divide le singole voci della stringa in input
+          $.each(inputSplit, function(){    //per ogni parola valida (diversa dalla stringa vuota) crea il formato da inviare al server
             if (this != ""){
               searchCamp += this + '%20';
             }
           })
           searchCamp = searchCamp.substring(0,searchCamp.length-3);
         }
-        else{
+        else{   //qual'ora non ci sia una stringa in input genera un alert e termina la funzione
           alert("input errato!");
           return;
-        }
-        if((tagList.length == undefined) || (tagList.length == 0)){
+        }   //a seconda della presenza o meno dei tag cambia la richiesta al server
+        if((tagList.length == undefined) || (tagList.length == 0)){   //controlla se sono stati selezionati dei tag oppure se il vettore dei tag è stato svuotato.
           string = "/keys/"+searchCamp;
           $.getJSON('http://blackarachnia.ingm.ad:49161'+string, function(data){
-          showTable(data);
+          showTableChart(data);
           })
         }
         else{
           string = "/tags/";
           $.each(tagList, function(){
-            string += this + '%20'
+            string += this + '%20'    //per ogni tag crea il formato da inviare al server
           })
           string = string.substring(0, string.length-3);
           $.getJSON('http://blackarachnia.ingm.ad:49161'+ string +'/keys/'+ searchCamp, function(data){
           console.log(data);
-          showTable(data);
+          showTableChart(data);
           }) 
         }
       }
-
-      function showTable(obj){
+      //LA FUNZIONE PIU' IMPORTANTE!!!  crea dal file JSON la struttura per creare le diverse tabelle ed i rispettivi chart
+      function showTableChart(obj){
         var pippo="";
         var hash = new Object();
         var array;
-        if(obj.objs.length == 0){
+        if(obj.objs.length == 0){   //se la risposta del server è vuota genera un alert e termina la funzione
           alert('The result is empty! try with other tag(s)');
           return;
         }
-        for (i=0 ; i<obj.gen_infos.nres ; i++){
+        for (i=0 ; i<obj.gen_infos.nres ; i++){   //controllo il filepath di ogni objs all'interno del JSON e per ciuscuno creo una key nell'oggetto obj 
           if(hash[obj.objs[i].infos.filepath] == undefined){ 
-            hash[obj.objs[i].infos.filepath] = new Array();
+            hash[obj.objs[i].infos.filepath] = new Array();   //ad ogni key dell'oggetto obj associa un array di array corrispondenti alle righe della tabella
           }
           array = new Array();
-          for(j=0 ; j<obj.objs[i].infos.header.length ; j++){
+          for(j=0 ; j<obj.objs[i].infos.header.length ; j++){   //legge ogni elemento, a cui accede con il nome della colonna della table, e lo aggiunge all'array
             if(array[obj.objs[i].infos.header[j]] == undefined || array[obj.objs[i].infos.header[j]] != 0){
               array.push(obj.objs[i].data[obj.objs[i].infos.header[j]]);
             }
           }
-          hash[obj.objs[i].infos.filepath].push(array);
+          hash[obj.objs[i].infos.filepath].push(array);   //quando a finito di popolare l'array lo inserisce all'array referenziato alla key
         }
         var count = 0;
-        var papa= new Array();
-        for(i=0 ; i<Object.keys(hash).length ; i++){
+        var papa = new Array();
+        for(i=0 ; i<Object.keys(hash).length ; i++){    //per ogni key dell'oggetto obj crea un array di array in cui va a creare la struttura da inviare a DataTable() per creare gli indici di colonna
           pippo = new Array();
           for(j=0 ; j<obj.gen_infos.nres ; j++){
            if(obj.objs[j].infos.filepath == Object.keys(hash)[i]){
               for(k=0 ; k<obj.objs[j].infos.header.length ; k++){
-                pippo.push({"title": obj.objs[j].infos.header[k]});
+                pippo.push({"title": obj.objs[j].infos.header[k]});   //struttura titoli di colonna
               }
               papa.push(pippo);
-              break;
+              break;    //evita di ripetere inutilmente la creazione degli indici di colonna della tabella
             }
           }
-          if(count == 0){
+          //per ogni tabella creata, genera un TAB e delle finestre ad esso associate, negli id è stato inserito un numero identificativo (count) 
+          if(count == 0){   
             $("<li class=\"active text-center\"><a href=\"#sectionResult_body_Content_"+count+"\" data-toggle=\"tab\" id=\"#sectionResult_body_Content_"+count+"\" onclick=\"switchContent(id)\">"+count+"</a></li>").appendTo('#sectionResult_body_Tab');
             $("<div class=\"tab-pane fade in active\" id=\"sectionResult_body_Content_"+count+"\"></div>").appendTo('#sectionResult_body_Content');
           }
@@ -106,15 +108,16 @@ html
             $("<li class=\"text-center\"><a href=\"#sectionResult_body_Content_"+count+"\" data-toggle=\"tab\" id=\"#sectionResult_body_Content_"+count+"\" onclick=\"switchContent(id)\">"+count+"</a></li>").appendTo('#sectionResult_body_Tab');
             $("<div class=\"tab-pane fade in\" id=\"sectionResult_body_Content_"+count+"\"></div>").appendTo('#sectionResult_body_Content');
           }
-          $("<div id=\"table_"+count+"\" class=\"myTable\"></div>").appendTo('#sectionResult_body_Content_'+count);
-          $("<div id=\"chart_"+count+"\" class=\"myChart\">"+count+"</div>").appendTo('#sectionResult_body_Content_'+count);
-          $("<div id=\"indexColumn_"+count+"\" class=\"myIndexColumn\"></div>").appendTo(SelectedFile_Body);
-          for(index=0;index<papa[count].length;index++){
+          $("<div id=\"table_"+count+"\" class=\"myTable\"></div>").appendTo('#sectionResult_body_Content_'+count);   //div per la table
+          $("<div id=\"chart_"+count+"\" class=\"myChart\"></div>").appendTo('#sectionResult_body_Content_'+count);   //div per il chart
+          $("<div id=\"indexColumn_"+count+"\" class=\"myIndexColumn\"></div>").appendTo(SelectedFile_Body);  //div per gli indici
+          for(index=0 ; index<papa[count].length ; index++){    //per ogni indice di colonna crea un lista di checkbox per selezionare le colonne da visualizzare nella tabella
             $("<label class=\"checkbox\"><p><input type=\"checkbox\" id=\"indexColumn"+count+"_"+papa[count][index]['title']+"\">"+papa[count][index]['title']+"</label>").appendTo('#indexColumn_'+count);
           }
-          if(count!=0){
+          if(count!=0){   //nasconde le div degli indici di colonna da non visualizzare immediatamente
             $('#indexColumn_'+count).hide();
           }
+          //crea la table 
           $("<table border=\"3\" class=\"table table-striped table-condensed\" id=\"example"+ count +"\"></table>").appendTo('#table_'+count);
           $('#example'+count).dataTable({
             "data": hash[Object.keys(hash)[count]],
@@ -122,6 +125,74 @@ html
           });
           count++;
         }
+        //controlla ciascun contenuto della prima riga della tabella è se non è un numero controlla che l'indice di riga contenga o meno una determina stringa, utile poi a creare il chart
+        var arrayNaN=[];
+        var supportoNaN=[];
+        var indexGene=[];
+        var rows=[];
+        var charts=[];
+        var dati=[];
+        for(i=0 ; i<papa.length ; i++){
+          arrayNaN=[];
+          for(k=0 ; k<hash[Object.keys(hash)[i]][0].length ; k++){
+            supportoNaN=[];
+            if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_short_name")==-1)){
+              supportoNaN.push(k);
+            }
+            else if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_short_name")!=-1)){
+              indexGene[i] = k;
+            }
+            if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_symbol")==-1)){
+              supportoNaN.push(k);
+            }
+            else if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_symbol")!=-1)){
+              indexGene[i] = k;
+            }
+          }
+          arrayNaN.push(supportoNaN); 
+          google.load('visualization', '1', {packages: ['corechart', 'bar']});
+          google.setOnLoadCallback(drawCharts);  
+          
+          function drawCharts(){
+            for(i=0 ; i<papa.length ; i++){
+              if(indexGene[i] != undefined){
+                dati[i] = new google.visualization.DataTable();
+                dati[i].addColumn('string', String(papa[i][indexGene[i]]['title'])); 
+                for(j=0 ; j<papa[i].length ; j++){
+                  if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_short_name")==-1)){
+                    dati[i].addColumn('number', String(papa[i][j]['title']));
+                  }
+                  else if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_symbol")==-1)){
+                    dati[i].addColumn('number', String(papa[i][j]['title']));
+                  }
+                }
+                for(j=0 ; j<hash[Object.keys(hash)[i]].length ; j++){
+                  rows=[];
+                  rows.push(hash[Object.keys(hash)[i]][j][indexGene[i]]);
+                  for(k=0 ; k<hash[Object.keys(hash)[i]][j].length ; k++){
+                    if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_short_name")==-1)){
+                      rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
+                    }
+                    else if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_symbol")==-1)){
+                      rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
+                    }
+                  }
+                  dati[i].addRow(rows);
+                }
+                var options = {
+                  height: 300,
+                  width: 600,     
+                };
+                charts[i] = new google.charts.Bar(document.getElementById('chart_'+i));
+                charts[i].draw(dati[i], options);
+              }
+              else{
+                $("<p>NoChart!</p>").appendTo('#chart_'+i);
+              }
+            }
+          }
+        }
+
         $('.myChart').hide();
         $('.myTable').show();
         $('a[href="#Result"]').tab('show');
