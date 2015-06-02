@@ -139,6 +139,12 @@ script(src='https://www.google.com/jsapi')
             else if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_short_name")!=-1)){
               indexGene = k;
             }
+            if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_symbol")==-1)){
+              supportoNaN.push(k);
+            }
+            else if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_symbol")!=-1)){
+              indexGene[i] = k;
+            }
           }
           arrayNaN.push(supportoNaN);  
           google.load('visualization', '1', {packages: ['corechart', 'bar']});
@@ -152,6 +158,9 @@ script(src='https://www.google.com/jsapi')
                 if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_short_name")==-1)){
                   dati[i].addColumn('number', String(papa[i][j]['title']));
                 }
+                else if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_symbol")==-1)){
+                    dati[i].addColumn('number', String(papa[i][j]['title']));
+                  }
               }
               for(j=0 ; j<hash[Object.keys(hash)[i]].length ; j++){
                 rows=[];
@@ -160,6 +169,9 @@ script(src='https://www.google.com/jsapi')
                   if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_short_name")==-1)){
                     rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
                   }
+                  else if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_symbol")==-1)){
+                      rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
+                    }
                 }
                 dati[i].addRow(rows);
               }
