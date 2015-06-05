@@ -11,6 +11,8 @@ html
     script(src='https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js')
     script(src='https://www.google.com/jsapi')
     script.
+      google.load('visualization', '1', {packages: ['corechart', 'bar']});
+      google.setOnLoadCallback(drawCharts); 
       var tagList=[];
       var searchCamp="";
       var hash = new Object();
@@ -153,9 +155,7 @@ html
             }
           }
           arrayNaN.push(supportoNaN); 
-        }  
-        google.load('visualization', '1', {packages: ['corechart', 'bar']});
-        google.setOnLoadCallback(drawCharts);  
+        }
 
         $('.myChart').hide();
         $('.myTable').show();
