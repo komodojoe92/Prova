@@ -13,15 +13,13 @@ html
     script.
       var tagList=[];   //lista dei tag che vengono selezionati
       var searchCamp="";    //stringa di ricerca data in input
-
       $(document).ready(function() {    //contata il server e rstituisce il vettore dei tag IN JSON, per ciascun tag crea un bottone all'interno di #listingTag_Body
-        $.getJSON('http://blackarachnia.ingm.ad:49161/tags', function(data){
+        $.getJSON('http://0.0.0.0:3000/tags', function(data){
           $.each(data, function(index,value){
             $("<div class=\"btn btn-default\" id=\""+ value +"\" style=\"margin-bottom:12px;margin-left:12px;\" onclick=\"selectionTag(id)\">" + value +"</div>").appendTo('#listingTag_Body');
           })
         })
       });
-
       function deleteTag(idBtn){    //quando clicco su un bottone già selezionato oppure cancello una voce dalla lista tag con l'apposito bottone, cancella la voce da tagList e il bottone viene deselezionato
       $('#line_'+ idBtn.split("_")[1]).remove();
       $('#'+idBtn.split("_")[1]).css("background-color", "");
@@ -49,7 +47,7 @@ html
         }   //a seconda della presenza o meno dei tag cambia la richiesta al server
         if((tagList.length == undefined) || (tagList.length == 0)){   //controlla se sono stati selezionati dei tag oppure se il vettore dei tag è stato svuotato.
           string = "/keys/"+searchCamp;
-          $.getJSON('http://blackarachnia.ingm.ad:49161'+string, function(data){
+          $.getJSON('http://0.0.0.0:3000'+string, function(data){
           showTableChart(data);
           })
         }
@@ -59,7 +57,7 @@ html
             string += this + '%20'    //per ogni tag crea il formato da inviare al server
           })
           string = string.substring(0, string.length-3);
-          $.getJSON('http://blackarachnia.ingm.ad:49161'+ string +'/keys/'+ searchCamp, function(data){
+          $.getJSON('http://0.0.0.0:3000'+ string +'/keys/'+ searchCamp, function(data){
           console.log(data);
           showTableChart(data);
           }) 
@@ -116,6 +114,7 @@ html
           }
           if(count!=0){   //nasconde le div degli indici di colonna da non visualizzare immediatamente
             $('#indexColumn_'+count).hide();
+            
           }
           //crea la table 
           $("<table border=\"3\" class=\"table table-striped table-condensed\" id=\"example"+ count +"\"></table>").appendTo('#table_'+count);
@@ -150,69 +149,70 @@ html
             }
           }
           arrayNaN.push(supportoNaN); 
-          google.load('visualization', '1', {packages: ['corechart', 'bar']});
-          google.setOnLoadCallback(drawCharts);  
-          
-          function drawCharts(){
-            for(i=0 ; i<papa.length ; i++){
-              if(indexGene[i] != undefined){
-                dati[i] = new google.visualization.DataTable();
-                dati[i].addColumn('string', String(papa[i][indexGene[i]]['title'])); 
-                for(j=0 ; j<papa[i].length ; j++){
-                  if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_short_name")==-1)){
-                    dati[i].addColumn('number', String(papa[i][j]['title']));
-                  }
-                  else if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_symbol")==-1)){
-                    dati[i].addColumn('number', String(papa[i][j]['title']));
-                  }
-                }
-                for(j=0 ; j<hash[Object.keys(hash)[i]].length ; j++){
-                  rows=[];
-                  rows.push(hash[Object.keys(hash)[i]][j][indexGene[i]]);
-                  for(k=0 ; k<hash[Object.keys(hash)[i]][j].length ; k++){
-                    if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_short_name")==-1)){
-                      rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
-                    }
-                    else if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_symbol")==-1)){
-                      rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
-                    }
-                  }
-                  dati[i].addRow(rows);
-                }
-                var options = {
-                  height: 300,
-                  width: 600,     
-                };
-                charts[i] = new google.charts.Bar(document.getElementById('chart_'+i));
-                charts[i].draw(dati[i], options);
-              }
-              else{
-                $("<p>NoChart!</p>").appendTo('#chart_'+i);
-              }
-            }
-          }
-        }
-
+        }  
+        //google.load('visualization', '1', {packages: ['corechart', 'bar']});
+        //google.setOnLoadCallback(drawCharts);  
         $('.myChart').hide();
         $('.myTable').show();
         $('a[href="#Result"]').tab('show');
       }
-
+      function drawCharts(){  //viene chiamata solo alla fine dell'esecuzione di tutta la funzione
+        for(i=0 ; i<papa.length ; i++){
+          if(indexGene[i] != undefined){
+            dati[i] = new google.visualization.DataTable();
+            dati[i].addColumn('string', String(papa[i][indexGene[i]]['title'])); 
+            
+            for(j=0 ; j<papa[i].length ; j++){  
+              if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_short_name")==-1)){
+                dati[i].addColumn('number', String(papa[i][j]['title']));
+              }
+              else if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_symbol")==-1)){
+                dati[i].addColumn('number', String(papa[i][j]['title']));
+              }
+            }
+            for(j=0 ; j<hash[Object.keys(hash)[i]].length ; j++){
+              rows=[];
+              rows.push(hash[Object.keys(hash)[i]][j][indexGene[i]]);
+              for(k=0 ; k<hash[Object.keys(hash)[i]][j].length ; k++){
+                if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_short_name")==-1)){
+                  rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
+                }
+                else if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_symbol")==-1)){
+                  rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
+                }
+              }
+              dati[i].addRow(rows);
+            }
+            var options = {
+              height: 300,
+              width: 600,     
+            };
+            
+            charts[i] = new google.charts.Bar(document.getElementById('chart_'+i));
+            charts[i].draw(dati[i], options);
+            console.log('i='+i+' chart made!');
+          }
+          else{ //se indexGene[i] è undefined
+            console.log('i='+i+' chart Not made!');
+            $("<p>NoChart!</p>").appendTo('#chart_'+i);
+          }
+        }
+      }
       function selectionTag(id){
-        if (tagList.indexOf(id)==-1){
+        if (tagList.indexOf(id)==-1){ //se l'id del bottone non è già presente in tagList, viene cambiato il background del bottone e viene aggiunto l'id alla varibaile, inoltre viene creata la riga nella tabella in SelectedTag
           document.getElementById(id).style.background="#ADFF2F";
           tagList.push(id);
           $('#SelectedTag_Body_TableBody').append("<tr id=\"line_"+ id +"\"><td>" + id + "</td><td><div class=\"btn btn-xs btn-danger\" id=\"deleteBtn_" + id +"\" onclick=\"deleteTag(id)\">X</div></td></tr>");
         }
-        else{
+        else{ //se l'id è presente nella varibaile, viene rimossa la riga, viene tolto l'id dalla varibaile tagList e ristabilito in background
           $('#line_'+ id).remove();
           $('#'+id).css("background-color", "");
           tagList.splice(tagList.indexOf(id),tagList.indexOf(id)+1);
         }
       }
-
+      //cambia la vista da tabelle a chart
       function switchTableChart(id){
-        var str = id.substring(id.length-5, id.length);
+        var str = id.substring(id.length-5, id.length); //l'id dei bottoni che chiamano la funzione differiscono solo nelle ultime 5 lettere 'table' o 'chart'
         $(id).class="active";
         if(str == 'table'){
           $('.myChart').hide();
@@ -223,11 +223,9 @@ html
           $('.myChart').show();
         }
       }
-
+      //mostra gli indici di colonna della tabella corrente
       function switchContent(id){
-        console.log(id);
         var index = id.substring(id.length-1,id.length);
-        console.log(index);
         $('.myIndexColumn').hide();
         $('#indexColumn_'+index).show();
       }
