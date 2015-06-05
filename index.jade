@@ -125,7 +125,7 @@ script(src='https://www.google.com/jsapi')
         }
         var arrayNaN=[];
         var supportoNaN=[];
-        var indexGene;
+        var indexGene=[];
         var rows=[];
         var charts=[];
         var dati=[];
@@ -137,7 +137,7 @@ script(src='https://www.google.com/jsapi')
               supportoNaN.push(k);
             }
             else if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_short_name")!=-1)){
-              indexGene = k;
+              indexGene[i] = k;
             }
             if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_symbol")==-1)){
               supportoNaN.push(k);
@@ -146,47 +146,59 @@ script(src='https://www.google.com/jsapi')
               indexGene[i] = k;
             }
           }
-          arrayNaN.push(supportoNaN);  
-          google.load('visualization', '1', {packages: ['corechart', 'bar']});
-          google.setOnLoadCallback(drawCharts);  
-          
-          function drawCharts(){
-            for(i=0 ; i<papa.length ; i++){
-              dati[i] = new google.visualization.DataTable();
-              dati[i].addColumn('string', String(papa[i][indexGene]['title'])); 
-              for(j=0 ; j<papa[i].length ; j++){
-                if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_short_name")==-1)){
-                  dati[i].addColumn('number', String(papa[i][j]['title']));
-                }
-                else if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_symbol")==-1)){
-                    dati[i].addColumn('number', String(papa[i][j]['title']));
-                  }
-              }
-              for(j=0 ; j<hash[Object.keys(hash)[i]].length ; j++){
-                rows=[];
-                rows.push(hash[Object.keys(hash)[i]][j][indexGene]);
-                for(k=0 ; k<hash[Object.keys(hash)[i]][j].length ; k++){
-                  if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_short_name")==-1)){
-                    rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
-                  }
-                  else if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_symbol")==-1)){
-                      rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
-                    }
-                }
-                dati[i].addRow(rows);
-              }
-              var options = {
-                height: 300,
-                width: 600,     
-              };
-              charts[i] = new google.charts.Bar(document.getElementById('chart_'+i));
-              charts[i].draw(dati[i], options);
-            }
-          }
-        }
+          arrayNaN.push(supportoNaN); 
+        }  
+        google.load('visualization', '1', {packages: ['corechart', 'bar']});
+        google.setOnLoadCallback(drawCharts);  
+
         $('.myChart').hide();
         $('.myTable').show();
         $('a[href="#Result"]').tab('show');
+      }
+
+      function drawCharts(){  //viene chiamata solo alla fine dell'esecuzione di tutta la funzione
+        for(i=0 ; i<papa.length ; i++){
+          if(indexGene[i] != undefined){
+            dati[i] = new google.visualization.DataTable();
+            dati[i].addColumn('string', String(papa[i][indexGene[i]]['title'])); 
+            
+            for(j=0 ; j<papa[i].length ; j++){  
+              if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_short_name")==-1)){
+                dati[i].addColumn('number', String(papa[i][j]['title']));
+              }
+              else if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_symbol")==-1)){
+                dati[i].addColumn('number', String(papa[i][j]['title']));
+              }
+            }
+
+            for(j=0 ; j<hash[Object.keys(hash)[i]].length ; j++){
+              rows=[];
+              rows.push(hash[Object.keys(hash)[i]][j][indexGene[i]]);
+              for(k=0 ; k<hash[Object.keys(hash)[i]][j].length ; k++){
+                if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_short_name")==-1)){
+                  rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
+                }
+                else if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_symbol")==-1)){
+                  rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
+                }
+              }
+              dati[i].addRow(rows);
+            }
+
+            var options = {
+              height: 300,
+              width: 600,     
+            };
+            
+            charts[i] = new google.charts.Bar(document.getElementById('chart_'+i));
+            charts[i].draw(dati[i], options);
+            console.log('i='+i+' chart made!');
+          }
+          else{ //se indexGene[i] è undefined
+            console.log('i='+i+' chart Not made!');
+            $("<p>NoChart!</p>").appendTo('#chart_'+i);
+          }
+        }
       }
 
       function selectionTag(id){
