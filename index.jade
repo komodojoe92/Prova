@@ -12,7 +12,6 @@ html
     script(src='https://www.google.com/jsapi')
     script.
       google.load('visualization', '1', {packages: ['corechart', 'bar']});
-      google.setOnLoadCallback(drawCharts); 
       var tagList=[];
       var searchCamp="";
       var hash = new Object();
@@ -116,7 +115,7 @@ html
             $("<div class=\"tab-pane fade in\" id=\"sectionResult_body_Content_"+count+"\"></div>").appendTo('#sectionResult_body_Content');
           }
           $("<div id=\"table_"+count+"\" class=\"myTable\"></div>").appendTo('#sectionResult_body_Content_'+count);
-          $("<div id=\"chart_"+count+"\" class=\"myChart\">"+count+"</div>").appendTo('#sectionResult_body_Content_'+count);
+          $("<div id=\"chart_"+count+"\" class=\"myChart\"></div>").appendTo('#sectionResult_body_Content_'+count);
           $("<div id=\"indexColumn_"+count+"\" class=\"myIndexColumn\"></div>").appendTo(SelectedFile_Body);
           for(index=0;index<papa[count].length;index++){
             $("<label class=\"checkbox\"><p><input type=\"checkbox\" id=\"indexColumn"+count+"_"+papa[count][index]['title']+"\">"+papa[count][index]['title']+"</label>").appendTo('#indexColumn_'+count);
@@ -156,7 +155,7 @@ html
           }
           arrayNaN.push(supportoNaN); 
         }
-
+        google.setOnLoadCallback(drawCharts());
         $('.myChart').hide();
         $('.myTable').show();
         $('a[href="#Result"]').tab('show');
