@@ -13,6 +13,14 @@ html
     script.
       var tagList=[];
       var searchCamp="";
+      var hash = new Object();
+      var arrayNaN=[];
+      var supportoNaN=[];
+      var indexGene=[];
+      var rows=[];
+      var charts=[];
+      var dati=[];
+      var papa = [];
 
       $(document).ready(function() {
         $.getJSON('http://blackarachnia.ingm.ad:49161/tags', function(data){
@@ -68,7 +76,6 @@ html
 
       function showTableChart(obj){
         var pippo="";
-        var hash = new Object();
         var array;
         if(obj.objs.length == 0){
           alert('The result is empty! try with other tag(s)');
@@ -87,7 +94,6 @@ html
           hash[obj.objs[i].infos.filepath].push(array);
         }
         var count = 0;
-        var papa= new Array();
         for(i=0 ; i<Object.keys(hash).length ; i++){
           pippo = new Array();
           for(j=0 ; j<obj.gen_infos.nres ; j++){
@@ -123,12 +129,12 @@ html
           });
           count++;
         }
-        var arrayNaN=[];
-        var supportoNaN=[];
-        var indexGene=[];
-        var rows=[];
-        var charts=[];
-        var dati=[];
+        arrayNaN=[];
+        supportoNaN=[];
+        indexGene=[];
+        rows=[];
+        charts=[];
+        dati=[];
         for(i=0 ; i<papa.length ; i++){
           arrayNaN=[];
           for(k=0 ; k<hash[Object.keys(hash)[i]][0].length ; k++){
