@@ -13,13 +13,15 @@ html
     script.
       var tagList=[];   //lista dei tag che vengono selezionati
       var searchCamp="";    //stringa di ricerca data in input
+
       $(document).ready(function() {    //contata il server e rstituisce il vettore dei tag IN JSON, per ciascun tag crea un bottone all'interno di #listingTag_Body
-        $.getJSON('http://0.0.0.0:3000/tags', function(data){
+        $.getJSON('http://blackarachnia.ingm.ad:49161/tags', function(data){
           $.each(data, function(index,value){
             $("<div class=\"btn btn-default\" id=\""+ value +"\" style=\"margin-bottom:12px;margin-left:12px;\" onclick=\"selectionTag(id)\">" + value +"</div>").appendTo('#listingTag_Body');
           })
         })
       });
+
       function deleteTag(idBtn){    //quando clicco su un bottone già selezionato oppure cancello una voce dalla lista tag con l'apposito bottone, cancella la voce da tagList e il bottone viene deselezionato
       $('#line_'+ idBtn.split("_")[1]).remove();
       $('#'+idBtn.split("_")[1]).css("background-color", "");
@@ -47,7 +49,7 @@ html
         }   //a seconda della presenza o meno dei tag cambia la richiesta al server
         if((tagList.length == undefined) || (tagList.length == 0)){   //controlla se sono stati selezionati dei tag oppure se il vettore dei tag è stato svuotato.
           string = "/keys/"+searchCamp;
-          $.getJSON('http://0.0.0.0:3000'+string, function(data){
+          $.getJSON('http://blackarachnia.ingm.ad:49161'+string, function(data){
           showTableChart(data);
           })
         }
@@ -57,7 +59,7 @@ html
             string += this + '%20'    //per ogni tag crea il formato da inviare al server
           })
           string = string.substring(0, string.length-3);
-          $.getJSON('http://0.0.0.0:3000'+ string +'/keys/'+ searchCamp, function(data){
+          $.getJSON('http://blackarachnia.ingm.ad:49161'+ string +'/keys/'+ searchCamp, function(data){
           console.log(data);
           showTableChart(data);
           }) 
@@ -150,12 +152,14 @@ html
           }
           arrayNaN.push(supportoNaN); 
         }  
-        //google.load('visualization', '1', {packages: ['corechart', 'bar']});
-        //google.setOnLoadCallback(drawCharts);  
+        google.load('visualization', '1', {packages: ['corechart', 'bar']});
+        google.setOnLoadCallback(drawCharts);  
+
         $('.myChart').hide();
         $('.myTable').show();
         $('a[href="#Result"]').tab('show');
       }
+
       function drawCharts(){  //viene chiamata solo alla fine dell'esecuzione di tutta la funzione
         for(i=0 ; i<papa.length ; i++){
           if(indexGene[i] != undefined){
@@ -170,6 +174,7 @@ html
                 dati[i].addColumn('number', String(papa[i][j]['title']));
               }
             }
+
             for(j=0 ; j<hash[Object.keys(hash)[i]].length ; j++){
               rows=[];
               rows.push(hash[Object.keys(hash)[i]][j][indexGene[i]]);
@@ -183,6 +188,7 @@ html
               }
               dati[i].addRow(rows);
             }
+
             var options = {
               height: 300,
               width: 600,     
@@ -198,6 +204,7 @@ html
           }
         }
       }
+
       function selectionTag(id){
         if (tagList.indexOf(id)==-1){ //se l'id del bottone non è già presente in tagList, viene cambiato il background del bottone e viene aggiunto l'id alla varibaile, inoltre viene creata la riga nella tabella in SelectedTag
           document.getElementById(id).style.background="#ADFF2F";
