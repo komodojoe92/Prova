@@ -12,7 +12,7 @@ html
     script(src='https://www.google.com/jsapi')
     script.
       google.load('visualization', '1', {packages: ['corechart', 'bar']});
-      google.setOnLoadCallback(drawCharts); 
+      
       var tagList=[];
       var searchCamp="";
       var hash = new Object();
@@ -79,6 +79,7 @@ html
       function showTableChart(obj){
         var pippo="";
         var array;
+        papa = [];
         if(obj.objs.length == 0){
           alert('The result is empty! try with other tag(s)');
           return;
@@ -156,7 +157,7 @@ html
           }
           arrayNaN.push(supportoNaN); 
         }
-
+        google.setOnLoadCallback(drawCharts()); 
         $('.myChart').hide();
         $('.myTable').show();
         $('a[href="#Result"]').tab('show');
