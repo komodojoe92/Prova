@@ -1,4 +1,4 @@
-google.load('visualization', '1', {packages: ['corechart', 'bar']});
+google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       
       var tagList=[];
       var searchCamp="";
@@ -57,9 +57,9 @@ google.load('visualization', '1', {packages: ['corechart', 'bar']});
           })
           string = string.substring(0, string.length-3);
           var uri = webserver+ string +'/keys/'+ searchCamp;
-          console.log(uri);
+          // console.log(uri);
           $.getJSON( uri, function(data){
-            console.log(data);
+            // console.log(data);
             showTableChart(data);
           })
         }
@@ -71,23 +71,19 @@ google.load('visualization', '1', {packages: ['corechart', 'bar']});
   */
   function tableToDataTableHeader(dataTable){
    
-    console.log(dataTable);
-    dataTable.header.map(function(column_name){
-      var h=[];
-      h['title']=column_name;
-      return h;
+    // console.log(dataTable);
+    return dataTable.header.map(function(columnName){
+      // console.log(columnName);
+      return {title:columnName};
     })
   }
 
   function tableToDataTableBody(dataTable){
-    dataTable.rows;
+    return dataTable.data;
   }
 
   function tableToDataTable(dataTable){
-    var h = [];
-    h['data']=tableToDataTableBody(dataTable);
-    h['columns']=tableToDataTableHeader(dataTable);
-    return h;
+    return {data:tableToDataTableBody(dataTable), columns:tableToDataTableHeader(dataTable)};
   }
 
       function showTableChart(tables){
@@ -98,21 +94,24 @@ google.load('visualization', '1', {packages: ['corechart', 'bar']});
 
       function createResults(tables){
         var keys = Object.keys(tables)
-        console.log(keys);
-        console.log(tables)
+        // console.log(keys);
+        // console.log(tables)
         for (var i = 0; i < keys.length; i++) {
           var tableName = keys[i];
-          console.log(tableName)
+          // console.log(tableName);
           var dataTable = tableToDataTable(tables[tableName]);
           // console.log(dataTable);
           createResultTab(i, i);
           createResultTable(dataTable, i);
           createResultChart(dataTable, i);
+          createColumnsSides(dataTable,i);
+          drawGoogleChart(dataTable,i);
         }
         $('.myChart').hide();
         $('.myTable').show();
-        $('#sectionResult_body_Content_'+0).addClass('active');
+        $('#sectionResult_body_Content_'+0).addClass('active');        
         $('a[href="#Result"]').tab('show');
+        // google.setOnLoadCallback(drawCharts()); 
       }
 
       function createResultTab(id, show_id ){
@@ -127,107 +126,70 @@ google.load('visualization', '1', {packages: ['corechart', 'bar']});
       }
 
       function createResultChart(table, id){
-        $("<div id=\"chart_"+id+"\" class=\"myChart\">"+id+"</div>").appendTo('#sectionResult_body_Content_'+id);
+        $("<div id=\"chart_"+id+"\" class=\"myChart\"></div>").appendTo('#sectionResult_body_Content_'+id);
       }
 
+      function createColumnsSides(table, id){
 
-      // function showTableChart(obj){
+          $("<div id=\"indexColumn_"+id+"\" class=\"myIndexColumn\" style=\"margin-left:8px;\"></div>").appendTo('#SelectedFile_Body');
+          for(index=0;index<table.columns.length; index++){
+            $("<label class=\"checkbox\"><p><input type=\"checkbox\" id=\"indexColumn_"+id+"_"+table.columns[index].title+"\">"+table.columns[index].title+"</label>").appendTo('#indexColumn_'+id);
+            $('#indexColumn_'+id+'_'+table.columns[index].title).prop('checked', true);
+          }
 
-      //   for(i=0 ; i<Object.keys(hash).length ; i++){
-  
-      //     if(count == 0){
-      //       $("<li class=\"active text-center\"><a href=\"#sectionResult_body_Content_"+count+"\" data-toggle=\"tab\" id=\"#sectionResult_body_Content_"+count+"\" onclick=\"switchContent(id)\">"+count+"</a></li>").appendTo('#sectionResult_body_Tab');
-      //       $("<div class=\"tab-pane fade in active\" id=\"sectionResult_body_Content_"+count+"\"></div>").appendTo('#sectionResult_body_Content');
-      //     }
-      //     else{
-      //       $("<li class=\"text-center\"><a href=\"#sectionResult_body_Content_"+count+"\" data-toggle=\"tab\" id=\"#sectionResult_body_Content_"+count+"\" onclick=\"switchContent(id)\">"+count+"</a></li>").appendTo('#sectionResult_body_Tab');
-      //       $("<div class=\"tab-pane fade in\" id=\"sectionResult_body_Content_"+count+"\"></div>").appendTo('#sectionResult_body_Content');
-      //     }
-      //     $("<div id=\"table_"+count+"\" class=\"myTable\"></div>").appendTo('#sectionResult_body_Content_'+count);
-      //     $("<div id=\"chart_"+count+"\" class=\"myChart\">"+count+"</div>").appendTo('#sectionResult_body_Content_'+count);
-      //     $("<div id=\"indexColumn_"+count+"\" class=\"myIndexColumn\"></div>").appendTo(SelectedFile_Body);
-      //     for(index=0;index<papa[count].length;index++){
-      //       $("<label class=\"checkbox\"><p><input type=\"checkbox\" id=\"indexColumn"+count+"_"+papa[count][index]['title']+"\">"+papa[count][index]['title']+"</label>").appendTo('#indexColumn_'+count);
-      //     }
-      //     if(count!=0){
-      //       $('#indexColumn_'+count).hide();
-      //     }
-      //   }
-      //   // arrayNaN=[];
-      //   // supportoNaN=[];
-      //   // indexGene=[];
-      //   // rows=[];
-      //   // charts=[];
-      //   // dati=[];
-      //   // for(i=0 ; i<papa.length ; i++){
-      //   //   arrayNaN=[];
-      //   //   for(k=0 ; k<hash[Object.keys(hash)[i]][0].length ; k++){
-      //   //     supportoNaN=[];
-      //   //     if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_short_name")==-1)){
-      //   //       supportoNaN.push(k);
-      //   //     }
-      //   //     else if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_short_name")!=-1)){
-      //   //       indexGene[i] = k;
-      //   //     }
-      //   //     if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_symbol")==-1)){
-      //   //       supportoNaN.push(k);
-      //   //     }
-      //   //     else if((isNaN(Number(hash[Object.keys(hash)[i]][0][k]))) && (papa[i][k]['title'].search("_symbol")!=-1)){
-      //   //       indexGene[i] = k;
-      //   //     }
-      //   //   }
-      //   //   arrayNaN.push(supportoNaN); 
-      //   // }
-      //   // google.setOnLoadCallback(drawCharts()); 
-      //   // $('.myChart').hide();
-      //   $('.myTable').show();
-      //   $('a[href="#Result"]').tab('show');
-      // }
 
-      function drawCharts(){  //viene chiamata solo alla fine dell'esecuzione di tutta la funzione
-        for(i=0 ; i<papa.length ; i++){
-          if(indexGene[i] != undefined){
-            dati[i] = new google.visualization.DataTable();
-            dati[i].addColumn('string', String(papa[i][indexGene[i]]['title'])); 
-            
-            for(j=0 ; j<papa[i].length ; j++){  
-              if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_short_name")==-1)){
-                dati[i].addColumn('number', String(papa[i][j]['title']));
-              }
-              else if((arrayNaN[0].indexOf(j)==-1) && (papa[i][j]['title'].search("_symbol")==-1)){
-                dati[i].addColumn('number', String(papa[i][j]['title']));
-              }
-            }
+      }
 
-            for(j=0 ; j<hash[Object.keys(hash)[i]].length ; j++){
-              rows=[];
-              rows.push(hash[Object.keys(hash)[i]][j][indexGene[i]]);
-              for(k=0 ; k<hash[Object.keys(hash)[i]][j].length ; k++){
-                if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_short_name")==-1)){
-                  rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
-                }
-                else if((arrayNaN[0].indexOf(k)==-1) && (papa[i][k]['title'].search("_symbol")==-1)){
-                  rows.push(Number(hash[Object.keys(hash)[i]][j][k]));
-                }
-              }
-              dati[i].addRow(rows);
-            }
+// TODO find a smart way to pick up the columns in the table to be visualized
+      function filterColumnsForChart(table, id){
+        var columnIndexes = [];
+        columnIndexes[0]=4;
+        for(i=0; i < table.columns.length; i++){
+          if (table.columns[i].title.search("_FPKM") != -1){
+            columnIndexes.push(i);
+          }
 
-            var options = {
+        }
+        return columnIndexes;
+      }
+
+      function generateHeaderForChart(table, id, columnIndexes){
+        var header = [];
+        for(i=0; i<columnIndexes.length; i++){
+          header.push(table.columns[columnIndexes[i]].title);
+        }
+        return header;
+      }
+
+      function generateRowsForChart(table, id, columnIndexes){
+        return table.data.map(function(row_data, row_index, row){
+          return columnIndexes.map(function(col_index, index, columns){
+            return row_data[col_index];
+          });
+
+        });
+      }
+
+      function dataTableToGoogleChartDataTable(header, rows, id){
+        return google.visualization.arrayToDataTable([header].concat(rows));
+      }
+
+      function drawGoogleChart(table, id){
+        var columnIndexes = filterColumnsForChart(table, id);
+
+        var header = generateHeaderForChart(table, id, columnIndexes);
+
+        var rows = generateRowsForChart(table, id, columnIndexes) ;
+        var googleDataTable = dataTableToGoogleChartDataTable(header, rows, id);
+
+        var options = {
               height: 300,
-              width: 600,     
+              width: 600
             };
             
-            charts[i] = new google.charts.Bar(document.getElementById('chart_'+i));
-            charts[i].draw(dati[i], options);
-            // console.log(dati[i]);
-            // console.log('i='+i+' chart made!');
-          }
-          else{ //se indexGene[i] è undefined
-            // console.log('i='+i+' chart Not made!');
-            $("<p>NoChart!</p>").appendTo('#chart_'+i);
-          }
-        }
+        chart = new google.charts.Bar(document.getElementById('chart_'+id));
+        chart.draw(googleDataTable, options);
+
       }
 
       function selectionTag(id){
