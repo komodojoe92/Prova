@@ -71,7 +71,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
   */
   function tableToDataTableHeader(dataTable){
    
-    // console.log(dataTable);
+     console.log(dataTable);
     return dataTable.header.map(function(columnName){
       // console.log(columnName);
       return {title:columnName};
