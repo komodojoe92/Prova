@@ -136,9 +136,26 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
           $("<div id=\"indexColumn_"+id+"\" class=\"myIndexColumn\" style=\"margin-left:8px;\"></div>").appendTo('#SelectedFile_Body');
           for(index=0;index<table.columns.length; index++){
-            $("<label class=\"checkbox\"><p><input type=\"checkbox\" id=\"indexColumn_"+id+"_"+table.columns[index].title+"\">"+table.columns[index].title+"</label>").appendTo('#indexColumn_'+id);
-            $('#indexColumn_'+id+'_'+table.columns[index].title).prop('checked', true);
+            $("<label class=\"checkbox\"><p><input type=\"checkbox\" id=\"indexColumn_"+id+"_"+table.columns[index].title+"_"+index+"\" onclick=\"hideShowColumnTable(id)\">"+table.columns[index].title+"</label>").appendTo('#indexColumn_'+id);
+            $('#indexColumn_'+id+'_'+table.columns[index].title+"_"+index).prop('checked', true);
           }
+      }
+
+      function hideShowColumnTable(id){
+        var numberOfTable=id.split("_")[1];
+        var indexCol=id.substring(id.length-2);
+        var i=indexCol.indexOf("_");
+        if (i > -1){
+          indexCol=indexCol.split("_")[1];
+        }
+        var table = $('#example'+numberOfTable).DataTable();
+        
+        if( $('#'+id).prop("checked") ){
+          table.column( indexCol ).visible( true );
+        }
+        else{
+          table.column( indexCol ).visible( false );
+        }
       }
 
 // TODO find a smart way to pick up the columns in the table to be visualized
