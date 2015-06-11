@@ -2,16 +2,13 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       
       var tagList=[];
       var searchCamp="";
-      var hash = new Object();
-      var arrayNaN=[];
-      var supportoNaN=[];
-      var indexGene=[];
-      var rows=[];
-      var charts=[];
-      var dati=[];
-      var papa = [];
 
       $(document).ready(function() {
+        $(window).css("width",screen.width);
+        $('#listingTag').css("max-height",screen.height-285 );
+        $('#SelectedTag').css("max-height",screen.height-285 );
+        $('#sectionResult').css("max-height",screen.height-285 );
+        $('#SelectedFile_Body').css("max-height",screen.height-322);
         $.getJSON(webserver+'/tags', function(data){
           $.each(data, function(index,value){
             $("<div class=\"btn btn-default\" id=\""+ value +"\" style=\"margin-bottom:12px;margin-left:12px;\" onclick=\"selectionTag(id)\">" + value +"</div>").appendTo('#listingTag_Body');
@@ -86,14 +83,18 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
     return {data:tableToDataTableBody(dataTable), columns:tableToDataTableHeader(dataTable)};
   }
 
-      function showTableChart(tables){
-
-        createResults(tables);
-      }
+  function showTableChart(tables){
+    createResults(tables);
+  }
 
 
       function createResults(tables){
-        var keys = Object.keys(tables)
+        var keys = Object.keys(tables);
+        if(keys.length == 0){
+          console.log(keys.length);
+          alert('No Result! Try with other param(s)!');
+          return;
+        }
         // console.log(keys);
         // console.log(tables)
         for (var i = 0; i < keys.length; i++) {
@@ -107,26 +108,28 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
           createColumnsSides(dataTable,i);
           drawGoogleChart(dataTable,i);
         }
+        $('.myIndexColumn').hide();
         $('.myChart').hide();
-        $('.myTable').show();
-        $('#sectionResult_body_Content_'+0).addClass('active');        
+        $('#indexColumn_0').show();
+        $('#sectionResult_body_Content_li_0').addClass('active');  
+        $('#sectionResult_body_Content_0').addClass('active');        
         $('a[href="#Result"]').tab('show');
         // google.setOnLoadCallback(drawCharts()); 
       }
 
       function createResultTab(id, show_id ){
-        $("<li class=\"text-center\"><a href=\"#sectionResult_body_Content_"+id+"\" data-toggle=\"tab\" id=\"#sectionResult_body_Content_"+id+"\" onclick=\"switchContent(id)\">"+show_id+"</a></li>").appendTo('#sectionResult_body_Tab');
-        $("<div class=\"tab-pane fade in\" id=\"sectionResult_body_Content_"+id+"\"></div>").appendTo('#sectionResult_body_Content');        
+        $("<li class=\"text-center\" id=\"sectionResult_body_Content_li_"+id+"\"><a href=\"#sectionResult_body_Content_"+id+"\" data-toggle=\"tab\" id=\"sectionResult_body_Content"+id+"\" onclick=\"switchContent(id)\">"+show_id+"</a></li>").appendTo('#sectionResult_body_Tab');
+        $("<div class=\"tab-pane fade in\" style=\"overflow:auto; max-height:"+(screen.height-405)+"px\" id=\"sectionResult_body_Content_"+id+"\"></div>").appendTo('#sectionResult_body_Content');        
       }
 
       function createResultTable(table, id){
-        $("<div id=\"table_"+id+"\" class=\"myTable\"></div>").appendTo('#sectionResult_body_Content_'+id);
+        $("<div id=\"table_"+id+"\" class=\"myTable\" style=\"overfloaw:auto ; height:100% ; width:100%\"></div>").appendTo('#sectionResult_body_Content_'+id);
         $("<table border=\"3\" class=\"table table-striped table-condensed\" id=\"example"+ id +"\"></table>").appendTo('#table_'+id);
         $('#example'+id).dataTable(table);
       }
 
       function createResultChart(table, id){
-        $("<div id=\"chart_"+id+"\" class=\"myChart\"></div>").appendTo('#sectionResult_body_Content_'+id);
+        $("<div id=\"chart_"+id+"\" class=\"myChart\" style=\"height:100% ; width:100%\"></div>").appendTo('#sectionResult_body_Content_'+id);
       }
 
       function createColumnsSides(table, id){
@@ -136,8 +139,6 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
             $("<label class=\"checkbox\"><p><input type=\"checkbox\" id=\"indexColumn_"+id+"_"+table.columns[index].title+"\">"+table.columns[index].title+"</label>").appendTo('#indexColumn_'+id);
             $('#indexColumn_'+id+'_'+table.columns[index].title).prop('checked', true);
           }
-
-
       }
 
 // TODO find a smart way to pick up the columns in the table to be visualized
@@ -181,11 +182,15 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
         var rows = generateRowsForChart(table, id, columnIndexes) ;
         var googleDataTable = dataTableToGoogleChartDataTable(header, rows, id);
-
         var options = {
-              height: 300,
-              width: 600
-            };
+              height: 400,
+              width: 900,
+              'chartArea':{left:0,top:10,width:"100%"},
+              legend: {
+                        position: "left",
+                        alignament: "start",
+                      },
+              };
             
         chart = new google.charts.Bar(document.getElementById('chart_'+id));
         chart.draw(googleDataTable, options);
