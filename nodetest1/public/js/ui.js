@@ -2,19 +2,51 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       
       var tagList=[];
       var searchCamp="";
+      var dati;
 
       $(document).ready(function() {
-        $(window).css("width",screen.width);
-        $('#listingTag').css("max-height",screen.height-285 );
-        $('#SelectedTag').css("max-height",screen.height-285 );
-        $('#sectionResult').css("max-height",screen.height-285 );
-        $('#SelectedFile_Body').css("max-height",screen.height-322);
+        setHeightWindows();
         $.getJSON(webserver+'/tags', function(data){
           $.each(data, function(index,value){
             $("<div class=\"btn btn-default\" id=\""+ value +"\" style=\"margin-bottom:12px;margin-left:12px;\" onclick=\"selectionTag(id)\">" + value +"</div>").appendTo('#listingTag_Body');
           })
         })
       });
+      
+      function setHeightWindows(){
+        var hWindow = calcHeightWindow(window);        
+        var hNavBar= calcHeightWindow('#navBar');
+        var hSectionTab= calcHeightWindow('#sectionTab');
+        var hListingTag_header= calcHeightWindow('#listingTag_header');
+        var hSelectedTag_header= calcHeightWindow('#SelectedTag_header');
+        var hSectionResult_header = calcHeightWindow('#sectionResult_header');
+        var hSelectedColumns_header= calcHeightWindow('#SelectedColumns_header');
+
+        var hListingTag_Body = hWindow-hNavBar-hSectionTab-hListingTag_header-75;
+        var hSelectedTag_Body = hWindow-hNavBar-hSectionTab-hSelectedTag_header-75;
+        var hSelectedColumns_Body = hWindow-hNavBar-hSectionTab-hSelectedColumns_header-75;
+
+        $('#listingTag_Body').css("max-height", hListingTag_Body);
+        $('#SelectedTag_Body').css("max-height",hSelectedTag_Body);
+        $('#SelectedColumns_Body').css("max-height",hSelectedColumns_Body);
+      }
+
+      function calcHeightWindow(id){
+        return $(id).height();
+      }
+
+      function selectionTag(id){
+        if (tagList.indexOf(id)==-1){
+          document.getElementById(id).style.background="#ADFF2F";
+          tagList.push(id);
+          $('#SelectedTag_Body_TableBody').append("<tr id=\"line_"+ id +"\"><td>" + id + "</td><td><div class=\"btn btn-xs btn-danger\" id=\"deleteBtn_" + id +"\" onclick=\"deleteTag(id)\">X</div></td></tr>");
+        }
+        else{
+          $('#line_'+ id).remove();
+          $('#'+id).css("background-color", "");
+          tagList.splice(tagList.indexOf(id),tagList.indexOf(id)+1);
+        }
+      }
 
       function deleteTag(idBtn){
       $('#line_'+ idBtn.split("_")[1]).remove();
@@ -27,7 +59,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var string="";
         $('#sectionResult_body_Tab').empty();
         $('#sectionResult_body_Content').empty();
-        $('#SelectedFile_Body').empty();
+        $('#SelectedColumns_Body').empty();
         if ($('#globalSearchForm').val() != ""){
           var inputSplit = $('#globalSearchForm').val().split(" ")
           $.each(inputSplit, function(){
@@ -62,31 +94,10 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         }
       }
 
-
-        /*
-  datasetName is the filepath/key to access the record data
-  */
-  function tableToDataTableHeader(dataTable){
-   
-     console.log(dataTable);
-    return dataTable.header.map(function(columnName){
-      // console.log(columnName);
-      return {title:columnName};
-    })
-  }
-
-  function tableToDataTableBody(dataTable){
-    return dataTable.data;
-  }
-
-  function tableToDataTable(dataTable){
-    return {data:tableToDataTableBody(dataTable), columns:tableToDataTableHeader(dataTable)};
-  }
-
-  function showTableChart(tables){
-    createResults(tables);
-  }
-
+      function showTableChart(tables){
+        dati=tables;
+        createResults(tables);
+      }
 
       function createResults(tables){
         var keys = Object.keys(tables);
@@ -106,7 +117,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
           createResultTable(dataTable, i);
           createResultChart(dataTable, i);
           createColumnsSides(dataTable,i);
-          drawGoogleChart(dataTable,i);
+          //drawGoogleChart(dataTable,i);
         }
         $('.myIndexColumn').hide();
         $('.myChart').hide();
@@ -117,13 +128,36 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         // google.setOnLoadCallback(drawCharts()); 
       }
 
+      function tableToDataTable(dataTable){
+        return {data:tableToDataTableBody(dataTable), columns:tableToDataTableHeader(dataTable)};
+      }
+
+      function tableToDataTableBody(dataTable){
+        return dataTable.data;
+      }
+
+      function tableToDataTableHeader(dataTable){
+        // console.log(dataTable);
+        return dataTable.header.map(function(columnName){
+          // console.log(columnName);
+          return {title:columnName};
+        })
+      }
+
       function createResultTab(id, show_id ){
+        var hWindow = $(window).height();        
+        var hNavBar= $('#navBar').height();
+        var hSectionTab= $('#sectionTab').height();
+        var hSectionResult_header = $('#sectionResult_header').height();
+
+        var hSectionResult_body = hWindow-hNavBar-hSectionTab-hSectionResult_header-158;
+
         $("<li class=\"text-center\" id=\"sectionResult_body_Content_li_"+id+"\"><a href=\"#sectionResult_body_Content_"+id+"\" data-toggle=\"tab\" id=\"sectionResult_body_Content"+id+"\" onclick=\"switchContent(id)\">"+show_id+"</a></li>").appendTo('#sectionResult_body_Tab');
-        $("<div class=\"tab-pane fade in\" style=\"overflow:auto; max-height:"+(screen.height-405)+"px\" id=\"sectionResult_body_Content_"+id+"\"></div>").appendTo('#sectionResult_body_Content');        
+        $("<div class=\"tab-pane fade in\" style=\"overflow:auto; max-height:"+(hSectionResult_body)+"px\" id=\"sectionResult_body_Content_"+id+"\"></div>").appendTo('#sectionResult_body_Content');        
       }
 
       function createResultTable(table, id){
-        $("<div id=\"table_"+id+"\" class=\"myTable\" style=\"overfloaw:auto ; height:100% ; width:100%\"></div>").appendTo('#sectionResult_body_Content_'+id);
+        $("<div id=\"table_"+id+"\" class=\"myTable\" style=\"overfloaw:auto ; height:100%\"></div>").appendTo('#sectionResult_body_Content_'+id);
         $("<table border=\"3\" class=\"table table-striped table-condensed\" id=\"example"+ id +"\"></table>").appendTo('#table_'+id);
         $('#example'+id).dataTable(table);
       }
@@ -134,13 +168,13 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
       function createColumnsSides(table, id){
 
-          $("<div id=\"indexColumn_"+id+"\" class=\"myIndexColumn\" style=\"margin-left:8px;\"></div>").appendTo('#SelectedFile_Body');
+          $("<div id=\"indexColumn_"+id+"\" class=\"myIndexColumn\" style=\"margin-left:8px;\"></div>").appendTo('#SelectedColumns_Body');
           for(index=0;index<table.columns.length; index++){
             $("<label class=\"checkbox\"><p><input type=\"checkbox\" id=\"indexColumn_"+id+"_"+table.columns[index].title+"_"+index+"\" onclick=\"hideShowColumnTable(id)\">"+table.columns[index].title+"</label>").appendTo('#indexColumn_'+id);
             $('#indexColumn_'+id+'_'+table.columns[index].title+"_"+index).prop('checked', true);
           }
       }
-
+  
       function hideShowColumnTable(id){
         var numberOfTable=id.split("_")[1];
         var indexCol=id.substring(id.length-2);
@@ -156,19 +190,48 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         else{
           table.column( indexCol ).visible( false );
         }
+        table.columns.adjust().draw();
       }
 
-// TODO find a smart way to pick up the columns in the table to be visualized
+      function drawGoogleChart(table, id){
+        var columnIndexes = filterColumnsForChart(table, id);
+
+        var header = generateHeaderForChart(table, id, columnIndexes);
+
+        var rows = generateRowsForChart(table, id, columnIndexes) ;
+        var googleDataTable = dataTableToGoogleChartDataTable(header, rows, id);
+        var options = {
+              height: 450,
+              width: 900,
+              legend: {
+                        alignament: "start"
+                      },
+              };
+            
+        chart = new google.charts.Bar(document.getElementById('chart_'+id));
+        chart.draw(googleDataTable, options);
+
+      }
+
       function filterColumnsForChart(table, id){
-        var columnIndexes = [];
-        columnIndexes[0]=4;
-        for(i=0; i < table.columns.length; i++){
+        var columnIndexesChecked = [];
+        //columnIndexes[0]=4;
+        columnIndexesChecked[0]=4;
+        $('#indexColumn_'+id).children().children().children().each(function(index,value){
+          //console.log(value.id);
+          if((value.checked) && ((value.id).search("_FPKM")!= -1)){
+            columnIndexesChecked.push(index);
+          }
+        });
+        console.log(columnIndexesChecked);
+        
+        /*for(i=0; i < table.columns.length; i++){
           if (table.columns[i].title.search("_FPKM") != -1){
             columnIndexes.push(i);
           }
 
-        }
-        return columnIndexes;
+        }*/
+        return columnIndexesChecked;
       }
 
       function generateHeaderForChart(table, id, columnIndexes){
@@ -192,44 +255,17 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         return google.visualization.arrayToDataTable([header].concat(rows));
       }
 
-      function drawGoogleChart(table, id){
-        var columnIndexes = filterColumnsForChart(table, id);
-
-        var header = generateHeaderForChart(table, id, columnIndexes);
-
-        var rows = generateRowsForChart(table, id, columnIndexes) ;
-        var googleDataTable = dataTableToGoogleChartDataTable(header, rows, id);
-        var options = {
-              height: 400,
-              width: 900,
-              'chartArea':{left:0,top:10,width:"100%"},
-              legend: {
-                        position: "left",
-                        alignament: "start",
-                      },
-              };
-            
-        chart = new google.charts.Bar(document.getElementById('chart_'+id));
-        chart.draw(googleDataTable, options);
-
-      }
-
-      function selectionTag(id){
-        if (tagList.indexOf(id)==-1){
-          document.getElementById(id).style.background="#ADFF2F";
-          tagList.push(id);
-          $('#SelectedTag_Body_TableBody').append("<tr id=\"line_"+ id +"\"><td>" + id + "</td><td><div class=\"btn btn-xs btn-danger\" id=\"deleteBtn_" + id +"\" onclick=\"deleteTag(id)\">X</div></td></tr>");
-        }
-        else{
-          $('#line_'+ id).remove();
-          $('#'+id).css("background-color", "");
-          tagList.splice(tagList.indexOf(id),tagList.indexOf(id)+1);
-        }
-      }
-
       function switchTableChart(id){
+        var idSectionActive= $('#sectionResult_body_Tab').children('.active').attr('id');
+        //console.log(idSectionActive);
+        var i = idSectionActive.split("_")[4];
+        //console.log(i);
+        var keys = Object.keys(dati);
+        var tableName = keys[i];
+        var dataTable = tableToDataTable(dati[tableName]);
+        
         var str = id.substring(id.length-5, id.length);
-        $(id).class="active";
+        $(id).prop="active";
         if(str == 'table'){
           $('.myChart').hide();
           $('.myTable').show();
@@ -237,6 +273,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         else{
           $('.myTable').hide();
           $('.myChart').show();
+          drawGoogleChart(dataTable,i);
         }
       }
 
@@ -244,6 +281,8 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         // console.log(id);
         var index = id.substring(id.length-1,id.length);
         // console.log(index);
+        $('.myTable').show();
         $('.myIndexColumn').hide();
+        $('.myChart').hide();
         $('#indexColumn_'+index).show();
       }
