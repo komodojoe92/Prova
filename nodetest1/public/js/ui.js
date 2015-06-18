@@ -199,6 +199,8 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var header = generateHeaderForChart(table, id, columnIndexes);
 
         var rows = generateRowsForChart(table, id, columnIndexes) ;
+        
+        rows = changeRowsFromStringToNumber(rows);
         var googleDataTable = dataTableToGoogleChartDataTable(header, rows, id);
         var options = {
               height: 450,
@@ -249,6 +251,17 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
           });
 
         });
+      }
+      
+      function changeRowsFromStringToNumber(rows){
+        $(rows).each(function(indexRow,value){
+          $(value).each(function(indexElement,val){
+            if(indexElement != 0){
+              rows[indexRow][indexElement] = Number(val);
+            }
+          });       
+        });
+        return rows;
       }
 
       function dataTableToGoogleChartDataTable(header, rows, id){
