@@ -10,6 +10,7 @@ html
     script(src='https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js')
     script(src='https://cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js')
     script(src='https://www.google.com/jsapi')
+    
     script.
       var webserver = "#{webserver}";
 
@@ -50,10 +51,10 @@ html
                 #Data.tab-pane.fade.in.active
                   .row
                     .col-lg-8
-                     #listingTag.panel.panel-default(style='overflow:auto;')
+                     #listingTag.panel.panel-default
                         #listingTag_header.panel-heading(style='height:40px;')
                           strong ListingTag
-                        #listingTag_Body.panel-body
+                        #listingTag_Body.panel-body(style='overflow:auto;')
                     .col-lg-4
                       #SelectedTag.panel.panel-default(style='overflow:auto;')
                         #SelectedTag_header.panel-heading(style='height:40px;')
@@ -96,7 +97,7 @@ html
                             p
                             #sectionResult_body_Content.tab-content(style='overflow:auto;')
                     .col-lg-2
-                      #SelectedFile.panel.panel-default
-                        #SelectedFile_header.panel-heading(style='height:40px;')
+                      #SelectedColumns.panel.panel-default
+                        #SelectedColumns_header.panel-heading(style='height:40px;')
                           strong SelectedColumns
-                        #SelectedFile_Body.panel-body(style='overflow:auto;')
+                        #SelectedColumns_Body.panel-body(style='overflow:auto;')
