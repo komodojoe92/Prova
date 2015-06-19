@@ -191,6 +191,10 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
           table.column( indexCol ).visible( false );
         }
         table.columns.adjust().draw();
+
+        if( $('.myChart').is(':visible') ){
+          switchTableChart(id);
+        }
       }
 
       function drawGoogleChart(table, id){
@@ -201,13 +205,20 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var rows = generateRowsForChart(table, id, columnIndexes) ;
         
         rows = changeRowsFromStringToNumber(rows);
+        
         var googleDataTable = dataTableToGoogleChartDataTable(header, rows, id);
+        var hSelectedColumns_Body = calcHeightWindow('#SelectedColumns_Body');
+        var hsectionResult_body_Tab = calcHeightWindow('#sectionResult_body_Tab');
+        
+        var hChart = hSelectedColumns_Body-hsectionResult_body_Tab-20;
+        var wChart = $('#sectionResult_body_Content').width()-20;
+
         var options = {
-              height: 450,
-              width: 900,
+              height: hChart,
+              width: wChart,
               legend: {
                         alignament: "start"
-                      },
+                      }
               };
             
         chart = new google.charts.Bar(document.getElementById('chart_'+id));
@@ -225,7 +236,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
             columnIndexesChecked.push(index);
           }
         });
-        console.log(columnIndexesChecked);
+        //console.log(columnIndexesChecked);
         
         /*for(i=0; i < table.columns.length; i++){
           if (table.columns[i].title.search("_FPKM") != -1){
@@ -252,7 +263,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
         });
       }
-      
+
       function changeRowsFromStringToNumber(rows){
         $(rows).each(function(indexRow,value){
           $(value).each(function(indexElement,val){
