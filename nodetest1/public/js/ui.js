@@ -123,7 +123,8 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         $('.myChart').hide();
         $('#indexColumn_0').show();
         $('#sectionResult_body_Content_li_0').addClass('active');  
-        $('#sectionResult_body_Content_0').addClass('active');        
+        $('#sectionResult_body_Content_0').addClass('active');
+        $('#sectionResult_header_switchSection_table').addClass('active');       
         $('a[href="#Result"]').tab('show');
         // google.setOnLoadCallback(drawCharts()); 
       }
@@ -145,10 +146,10 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       }
 
       function createResultTab(id, show_id ){
-        var hWindow = $(window).height();        
-        var hNavBar= $('#navBar').height();
-        var hSectionTab= $('#sectionTab').height();
-        var hSectionResult_header = $('#sectionResult_header').height();
+        var hWindow = calcHeightWindow(window);        
+        var hNavBar= calcHeightWindow('#navBar');
+        var hSectionTab= calcHeightWindow('#sectionTab');
+        var hSectionResult_header = calcHeightWindow('#sectionResult_header');
 
         var hSectionResult_body = hWindow-hNavBar-hSectionTab-hSectionResult_header-158;
 
@@ -170,7 +171,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
           $("<div id=\"indexColumn_"+id+"\" class=\"myIndexColumn\" style=\"margin-left:8px;\"></div>").appendTo('#SelectedColumns_Body');
           for(index=0;index<table.columns.length; index++){
-            $("<label class=\"checkbox\"><p><input type=\"checkbox\" id=\"indexColumn_"+id+"_"+table.columns[index].title+"_"+index+"\" onclick=\"hideShowColumnTable(id)\">"+table.columns[index].title+"</label>").appendTo('#indexColumn_'+id);
+            $("<label class=\"checkbox\"><p class=\"myIndexCheckbox\"><input type=\"checkbox\" id=\"indexColumn_"+id+"_"+table.columns[index].title+"_"+index+"\" onclick=\"hideShowColumnTable(id)\">"+table.columns[index].title+"</label>").appendTo('#indexColumn_'+id);
             $('#indexColumn_'+id+'_'+table.columns[index].title+"_"+index).prop('checked', true);
           }
       }
@@ -193,12 +194,15 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         table.columns.adjust().draw();
 
         if( $('.myChart').is(':visible') ){
+          var idForSwitchContent = "Content"+id.split("_")[4];
           switchTableChart(id);
         }
       }
 
       function drawGoogleChart(table, id){
-        var columnIndexes = filterColumnsForChart(table, id);
+        //var columnIndexes = filterColumnsForChart(table, id);
+        //dal server, insieme ai dati viene inviato per ciascun grafico, l'indice dell'elemento di riferimento per l'asse x ed la sottostringa degli elementi da graficare nel chartS
+        var columnIndexes = filterColumnsForChart(table, id, 4, "FPKM");
 
         var header = generateHeaderForChart(table, id, columnIndexes);
 
@@ -210,10 +214,15 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var hSelectedColumns_Body = calcHeightWindow('#SelectedColumns_Body');
         var hsectionResult_body_Tab = calcHeightWindow('#sectionResult_body_Tab');
         
-        var hChart = hSelectedColumns_Body-hsectionResult_body_Tab-20;
+        var hChart = $('#listingTag_Body').css('max-height').split("px")[0]-hsectionResult_body_Tab-20;
         var wChart = $('#sectionResult_body_Content').width()-20;
 
+        var tableName = Object.keys(dati)[0];
+
         var options = {
+              chart: {
+                title: tableName
+              },
               height: hChart,
               width: wChart,
               legend: {
@@ -236,14 +245,18 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
             columnIndexesChecked.push(index);
           }
         });
-        //console.log(columnIndexesChecked);
-        
-        /*for(i=0; i < table.columns.length; i++){
-          if (table.columns[i].title.search("_FPKM") != -1){
-            columnIndexes.push(i);
-          }
+        return columnIndexesChecked;
+      }
 
-        }*/
+      function filterColumnsForChart(table, id, indexVaxis, substring){
+        var columnIndexesChecked = [];
+        columnIndexesChecked[0]=indexVaxis;
+        $('#indexColumn_'+id).children().children().children().each(function(index,value){
+          //console.log(value.id);
+          if((value.checked) && ((value.id).search(substring)!= -1)){
+            columnIndexesChecked.push(index);
+          }
+        });
         return columnIndexesChecked;
       }
 
@@ -281,32 +294,50 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
       function switchTableChart(id){
         var idSectionActive= $('#sectionResult_body_Tab').children('.active').attr('id');
-        //console.log(idSectionActive);
-        var i = idSectionActive.split("_")[4];
-        //console.log(i);
-        var keys = Object.keys(dati);
-        var tableName = keys[i];
-        var dataTable = tableToDataTable(dati[tableName]);
-        
-        var str = id.substring(id.length-5, id.length);
-        $(id).prop="active";
-        if(str == 'table'){
-          $('.myChart').hide();
-          $('.myTable').show();
+        var idForSwitchContent = idSectionActive.split("_")[2]+idSectionActive.split("_")[4];
+        var buttonName = id.split("_")[3];
+
+        if(buttonName == 'table'){
+          $('#sectionResult_header_switchSection_chart').removeClass('active');    
+          $('#sectionResult_header_switchSection_table').addClass('active');
         }
         else{
-          $('.myTable').hide();
-          $('.myChart').show();
-          drawGoogleChart(dataTable,i);
+          $('#sectionResult_header_switchSection_table').removeClass('active');    
+          $('#sectionResult_header_switchSection_chart').addClass('active');
         }
+        switchContent(idForSwitchContent);
       }
 
       function switchContent(id){
-        // console.log(id);
-        var index = id.substring(id.length-1,id.length);
-        // console.log(index);
-        $('.myTable').show();
+        var index = id.split('Content')[1];
         $('.myIndexColumn').hide();
+        $('.myTable').hide();
         $('.myChart').hide();
+
+        if( $('#sectionResult_header_switchSection_chart').is('.active') ){
+          $('#chart_'+index).show();
+          //console.log('chart_'+index);
+          var keys = Object.keys(dati);
+          var tableName = keys[index];
+          var dataTable = tableToDataTable(dati[tableName]);
+          filterDivColumnForChart(dataTable,index,4,"_FPKM");
+          drawGoogleChart(dataTable,index);
+        }
+        else{
+          //console.log('table');
+          $('#table_'+index).show();
+          $('.myIndexCheckbox').show();        
+        }
         $('#indexColumn_'+index).show();
+      }
+
+      function filterDivColumnForChart(table, id, indexVaxis, substring){
+        var columnIndexesChecked = [];
+        columnIndexesChecked[0]=indexVaxis;
+        $('#indexColumn_'+id).children().children().children().each(function(index,value){
+          //console.log(value.id);
+          if((value.id).search(substring) == -1){
+            $(value).parent().hide();
+          }
+        });
       }
