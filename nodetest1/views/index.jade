@@ -97,6 +97,15 @@ html
                             p
                             #sectionResult_body_Content.tab-content(style='overflow:auto;')
                     .col-lg-2
+                      #SelectColumnsForChart.panel.panel-default
+                        #SelectColumnsForChart_header.panel-heading(style='height:40px;')
+                          strong ColumnsForChart
+                        #SelectColumnsForChart_Body.panel-body
+                          input#SelectColumnsForChart_Body_HaxisForm.form-control.input-sm(type='search', placeholder='Enter vAxis', style='width:100%;')
+                          p#SelectColumnsForChart_Body_HaxisForm_Warning.text-danger.small(style='height:8px;')
+                          input#SelectColumnsForChart_Body_ColumnsForm.form-control.input-sm(type='search', placeholder='Enter string', style='width:100%;')
+                          p#SelectColumnsForChart_Body_ColumnsForm_Warning.text-danger.small(style='height:8px;')
+                          button#SelectColumnsForChart_Body_EnterButton.btn.btn-primary.btn-sm(type='button' style='float: right;' onclick='sendStringsForChart()') Enter
                       #SelectedColumns.panel.panel-default
                         #SelectedColumns_header.panel-heading(style='height:40px;')
                           strong SelectedColumns
