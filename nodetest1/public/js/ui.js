@@ -1,7 +1,6 @@
 google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       
       var tagList=[];
-      var searchCamp="";
       var dati;
 
       $(document).ready(function() {
@@ -15,16 +14,17 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       
       function setHeightWindows(){
         var hWindow = calcHeightWindow(window);        
-        var hNavBar= calcHeightWindow('#navBar');
-        var hSectionTab= calcHeightWindow('#sectionTab');
+        var hNavBar = calcHeightWindow('#navBar');
+        var hSectionTab = calcHeightWindow('#sectionTab');
         var hListingTag_header= calcHeightWindow('#listingTag_header');
         var hSelectedTag_header= calcHeightWindow('#SelectedTag_header');
         var hSectionResult_header = calcHeightWindow('#sectionResult_header');
-        var hSelectedColumns_header= calcHeightWindow('#SelectedColumns_header');
+        var hSelectedColumns_header = calcHeightWindow('#SelectedColumns_header');
+        var hSelectColumnsForChart = 180;
 
         var hListingTag_Body = hWindow-hNavBar-hSectionTab-hListingTag_header-75;
         var hSelectedTag_Body = hWindow-hNavBar-hSectionTab-hSelectedTag_header-75;
-        var hSelectedColumns_Body = hWindow-hNavBar-hSectionTab-hSelectedColumns_header-75;
+        var hSelectedColumns_Body = hWindow-hNavBar-hSectionTab-hSelectColumnsForChart-hSelectedColumns_header-113;
 
         $('#listingTag_Body').css("max-height", hListingTag_Body);
         $('#SelectedTag_Body').css("max-height",hSelectedTag_Body);
@@ -36,62 +36,84 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       }
 
       function selectionTag(id){
-        if (tagList.indexOf(id)==-1){
+        var indexOfTagName = tagList.indexOf(id);
+
+        if (indexOfTagName == -1){
           document.getElementById(id).style.background="#ADFF2F";
           tagList.push(id);
-          $('#SelectedTag_Body_TableBody').append("<tr id=\"line_"+ id +"\"><td>" + id + "</td><td><div class=\"btn btn-xs btn-danger\" id=\"deleteBtn_" + id +"\" onclick=\"deleteTag(id)\">X</div></td></tr>");
+          $('#SelectedTag_Body_TableBody').append("<tr id=\"line_"+ id +"\"><td>" + id + "</td><td><div class=\"btn btn-xs btn-danger\" id=\"deleteBtn/" + id +"\" onclick=\"deleteTag(id)\">X</div></td></tr>");
         }
         else{
           $('#line_'+ id).remove();
           $('#'+id).css("background-color", "");
-          tagList.splice(tagList.indexOf(id),tagList.indexOf(id)+1);
+          tagList.splice(indexOfTagName,indexOfTagName+1);
         }
       }
 
       function deleteTag(idBtn){
-      $('#line_'+ idBtn.split("_")[1]).remove();
-      $('#'+idBtn.split("_")[1]).css("background-color", "");
-      tagList.splice(tagList.indexOf(idBtn.split("_")[1]),tagList.indexOf(idBtn.split("_")[1])+1);
+        var tagName = idBtn.split("/")[1];
+        var indexOfTagName = tagList.indexOf(tagName);
+
+        $('#line_'+tagName).remove();
+        $('#'+tagName).css("background-color", "");
+        tagList.splice(indexOfTagName,indexOfTagName+1);
       }
 
       function sendList(){
-        searchCamp="";
-        var string="";
+        var searchCampString = "";
+        var listOfTagString = "";
+        var stringToServer = "";
+
+        resetVariableAndDiv();
+        $('#globalSearchCampWarning').remove();
+        
+        var inputValue = $('#globalSearchForm').val();
+        var inputValueSplit = inputValue.split(" ");
+
+        searchCampString = setStringOfKeys(inputValueSplit);
+        listOfTagString = setStringOfKeys(tagList);
+        //console.log(searchCampString);
+        //console.log(listOfTagString);
+
+        if(searchCampString == ""){
+          $("<p id=\"globalSearchCampWarning\"class=\"text-danger small\">*missing string</p>").appendTo('#globalSearch');
+        }
+        else if (listOfTagString == ""){
+          stringToServer = "/keys/" + searchCampString;
+        }
+        else{
+          searchCampString = "/keys/" + searchCampString;
+          listOfTagString = "/tags/" + listOfTagString;
+          stringToServer = listOfTagString + searchCampString;
+        }
+        //console.log(stringToServer);
+        $.getJSON(webserver+stringToServer, function(data){
+            showTableChart(data);
+          });
+       } 
+
+      function resetVariableAndDiv(){
+        $('#emptyResultWarning').remove();
         $('#sectionResult_body_Tab').empty();
         $('#sectionResult_body_Content').empty();
         $('#SelectedColumns_Body').empty();
-        if ($('#globalSearchForm').val() != ""){
-          var inputSplit = $('#globalSearchForm').val().split(" ")
-          $.each(inputSplit, function(){
-            if (this != ""){
-              searchCamp += this + '%20';
-            }
-          })
-          searchCamp = searchCamp.substring(0,searchCamp.length-3);
-        }
-        else{
-          alert("input errato!");
-          return;
-        }
-        if((tagList.length == undefined) || (tagList.length == 0)){
-          string = "/keys/"+searchCamp;
-          $.getJSON(webserver+string, function(data){
-          showTableChart(data);
-          })
-        }
-        else{
-          string = "/tags/";
-          $.each(tagList, function(){
-            string += this + '%20'
-          })
-          string = string.substring(0, string.length-3);
-          var uri = webserver+ string +'/keys/'+ searchCamp;
-          // console.log(uri);
-          $.getJSON( uri, function(data){
-            // console.log(data);
-            showTableChart(data);
-          })
-        }
+      }
+
+      function setStringOfKeys(inputValueSplit){
+        var stringOfKeys="";
+
+        $.each(inputValueSplit, function(index,value){
+          if (value != ""){
+            stringOfKeys += value + '%20';
+          }
+        });
+
+        stringOfKeys = deleteLastThreeCharacters(stringOfKeys);
+        return stringOfKeys;
+      }
+
+      function deleteLastThreeCharacters(string){
+        return string.substring(0, string.length-3);
       }
 
       function showTableChart(tables){
@@ -102,8 +124,8 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       function createResults(tables){
         var keys = Object.keys(tables);
         if(keys.length == 0){
-          console.log(keys.length);
-          alert('No Result! Try with other param(s)!');
+          //console.log(keys.length);
+          $("<p id=\"emptyResultWarning\"class=\"text-danger\">*No result! Please, retry with other params.</p>").appendTo('#sectionResult_body');
           return;
         }
         // console.log(keys);
@@ -202,7 +224,13 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       function drawGoogleChart(table, id){
         //var columnIndexes = filterColumnsForChart(table, id);
         //dal server, insieme ai dati viene inviato per ciascun grafico, l'indice dell'elemento di riferimento per l'asse x ed la sottostringa degli elementi da graficare nel chartS
-        var columnIndexes = filterColumnsForChart(table, id, 4, "FPKM");
+        var keys = Object.keys(dati);
+        var tableName = keys[id];
+        /*if(dati[tableName]['stringColumns'] == undefined){
+          alert('input Error! Please enter a valid column\'s name');
+          return;
+        }*/
+        var columnIndexes = filterColumnsForChart(table, id, dati[tableName]['hAxis'], dati[tableName]['stringColumns']);
 
         var header = generateHeaderForChart(table, id, columnIndexes);
 
@@ -235,25 +263,16 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
       }
 
-      function filterColumnsForChart(table, id){
-        var columnIndexesChecked = [];
-        //columnIndexes[0]=4;
-        columnIndexesChecked[0]=4;
-        $('#indexColumn_'+id).children().children().children().each(function(index,value){
-          //console.log(value.id);
-          if((value.checked) && ((value.id).search("_FPKM")!= -1)){
-            columnIndexesChecked.push(index);
-          }
-        });
-        return columnIndexesChecked;
-      }
-
       function filterColumnsForChart(table, id, indexVaxis, substring){
         var columnIndexesChecked = [];
         columnIndexesChecked[0]=indexVaxis;
+        var keys = Object.keys(dati);
+        var tableName = keys[id];
+
         $('#indexColumn_'+id).children().children().children().each(function(index,value){
           //console.log(value.id);
-          if((value.checked) && ((value.id).search(substring)!= -1)){
+          //console.log(substring);
+          if((value.checked) && ((value.id).search(substring)!= -1) && !isNaN(Number(table['data'][0][index] ) ) ){
             columnIndexesChecked.push(index);
           }
         });
@@ -310,34 +329,97 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
       function switchContent(id){
         var index = id.split('Content')[1];
+
+        var keys = Object.keys(dati);
+        var tableName = keys[index];
+        var dataTable = tableToDataTable(dati[tableName]);
+        var hAxis = dati[tableName]['hAxis'];
+        var stringColumns = dati[tableName]['stringColumns'];
+
         $('.myIndexColumn').hide();
         $('.myTable').hide();
         $('.myChart').hide();
 
-        if( $('#sectionResult_header_switchSection_chart').is('.active') ){
+        if( $('#sectionResult_header_switchSection_chart').is('.active') && (hAxis!=undefined) && (stringColumns!=undefined) ){
           $('#chart_'+index).show();
+          $('#SelectColumnsForChart_Body_HaxisForm_Warning').empty();
+          $('#SelectColumnsForChart_Body_ColumnsForm_Warning').empty();
+          $('#SelectColumnsForChart_Body_HaxisForm').val(dati[tableName]['header'][hAxis]);
+          $('#SelectColumnsForChart_Body_ColumnsForm').val(stringColumns);
           //console.log('chart_'+index);
-          var keys = Object.keys(dati);
-          var tableName = keys[index];
-          var dataTable = tableToDataTable(dati[tableName]);
-          filterDivColumnForChart(dataTable,index,4,"_FPKM");
+          $(".myIndexCheckbox").show();
+          filterDivColumnForChart(dati[tableName],index,hAxis,stringColumns);
           drawGoogleChart(dataTable,index);
         }
-        else{
+        else if ($('#sectionResult_header_switchSection_table').is('.active')){
           //console.log('table');
           $('#table_'+index).show();
-          $('.myIndexCheckbox').show();        
+          $('.myIndexCheckbox').show();
+          $('#SelectColumnsForChart_Body_HaxisForm_Warning').empty();
+          $('#SelectColumnsForChart_Body_ColumnsForm_Warning').empty();
+          $('#SelectColumnsForChart_Body_HaxisForm').val('');
+          $('#SelectColumnsForChart_Body_ColumnsForm').val('');      
+        }
+        else{
+          $('#SelectColumnsForChart_Body_HaxisForm').val('');
+          $('#SelectColumnsForChart_Body_ColumnsForm').val('');
+          sendStringsForChart();
         }
         $('#indexColumn_'+index).show();
       }
 
       function filterDivColumnForChart(table, id, indexVaxis, substring){
         var columnIndexesChecked = [];
+        var fistRowData =  table['data'][0];
         columnIndexesChecked[0]=indexVaxis;
+
         $('#indexColumn_'+id).children().children().children().each(function(index,value){
-          //console.log(value.id);
-          if((value.id).search(substring) == -1){
+          var firstRowDataElementNumeric = Number(fistRowData[index]);
+          if((value.id).search(substring) == -1 || (isNaN(firstRowDataElementNumeric)) ){
             $(value).parent().hide();
           }
         });
+      }
+
+      function sendStringsForChart(){
+        var stringHaxis = "";
+        var stringColumns ="";
+        var idSectionActive= $('#sectionResult_body_Tab').children('.active').attr('id');
+        var numberOfTable = idSectionActive.split("_")[4];
+        var keys = Object.keys(dati);
+        var filepath = keys[numberOfTable];
+        $('#SelectColumnsForChart_Body_HaxisForm_Warning').empty();
+        $('#SelectColumnsForChart_Body_ColumnsForm_Warning').empty();
+        //console.log(filepath);
+        setVaxisValue(filepath);
+
+        setStringOfColumns(filepath);
+      }
+
+      function setVaxisValue(filepath){
+        if($('#SelectColumnsForChart_Body_HaxisForm').val() != "" ){
+          stringHaxis = $('#SelectColumnsForChart_Body_HaxisForm').val();
+          stringHaxis = stringHaxis.split(" ")[0];
+          var index = (dati[filepath]['header']).indexOf(stringHaxis);
+          if(isNaN(Number(dati[filepath]['data'][0][index]))){
+            dati[filepath]['hAxis'] = index;
+          }
+          //console.log(dati[filepath]['hAxis']);
+        }
+        else{
+          $('#SelectColumnsForChart_Body_HaxisForm_Warning').text("*missing input.");
+        }
+      }
+
+      function setStringOfColumns(filepath){
+        if($('#SelectColumnsForChart_Body_ColumnsForm').val() != "" ){
+          stringColumns = $('#SelectColumnsForChart_Body_ColumnsForm').val();
+          stringColumns = stringColumns.split(" ")[0];
+          dati[filepath]['stringColumns'] =  stringColumns;
+          //console.log(dati[filepath]['stringColumns']);
+          switchTableChart('sectionResult_header_switchSection_chart');
+        }
+        else{
+          $('#SelectColumnsForChart_Body_ColumnsForm_Warning').text("*missing input.");
+        }
       }
