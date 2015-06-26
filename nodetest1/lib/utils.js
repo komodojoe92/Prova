@@ -27,8 +27,10 @@ module.exports = {
         // in case the filepath (key for a dataset) is not present, creates a new array of elements for that key
         if(dataTables[filepath] == undefined){
           var h = {};
-          h['data']=[];
-          h['header']=record.infos.header;
+          h['data'] = [];
+          h['header'] = record.infos.header;
+          h['hAxis'] = 3;
+          h['stringColumns'] = "FPKM";
           dataTables[filepath] = h;
         }
 
@@ -45,5 +47,3 @@ module.exports = {
   }
 
 }; //module.exports
-
-
