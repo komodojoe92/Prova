@@ -7,7 +7,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         setHeightWindows();
         $.getJSON(webserver+'/tags', function(data){
           $.each(data, function(index,value){
-            $("<div class=\"btn btn-default\" id=\""+ value +"\" style=\"margin-bottom:12px;margin-left:12px;\" onclick=\"selectionTag(id)\">" + value +"</div>").appendTo('#listingTag_Body');
+            $("<div class=\"btn btn-default\" id=\""+ value +"\" style=\"margin-bottom:12px;margin-left:12px;\" onclick=\"selectionTag(id)\">" + value +"</div>").appendTo('#listingTag_body');
           })
         })
       });
@@ -17,18 +17,18 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var hNavBar = calcHeightWindow('#navBar');
         var hSectionTab = calcHeightWindow('#sectionTab');
         var hListingTag_header= calcHeightWindow('#listingTag_header');
-        var hSelectedTag_header= calcHeightWindow('#SelectedTag_header');
+        var hSelectedTag_header= calcHeightWindow('#selectedTag_header');
         var hSectionResult_header = calcHeightWindow('#sectionResult_header');
-        var hSelectedColumns_header = calcHeightWindow('#SelectedColumns_header');
-        var hSelectColumnsForChart = 180;
+        var hListingColumns_header = calcHeightWindow('#listingColumns_header');
+        var hSelectColumnsForChart = 230;
 
-        var hListingTag_Body = hWindow-hNavBar-hSectionTab-hListingTag_header-75;
-        var hSelectedTag_Body = hWindow-hNavBar-hSectionTab-hSelectedTag_header-75;
-        var hSelectedColumns_Body = hWindow-hNavBar-hSectionTab-hSelectColumnsForChart-hSelectedColumns_header-113;
+        var hListingTag_body = hWindow-hNavBar-hSectionTab-hListingTag_header-75;
+        var hSelectedTag_body = hWindow-hNavBar-hSectionTab-hSelectedTag_header-75;
+        var hListingColumns_body = hWindow-hNavBar-hSectionTab-hSelectColumnsForChart-hListingColumns_header-103;
 
-        $('#listingTag_Body').css("max-height", hListingTag_Body);
-        $('#SelectedTag_Body').css("max-height",hSelectedTag_Body);
-        $('#SelectedColumns_Body').css("max-height",hSelectedColumns_Body);
+        $('#listingTag_body').css("max-height", hListingTag_body);
+        $('#selectedTag_body').css("max-height",hSelectedTag_body);
+        $('#listingColumns_body').css("max-height",hListingColumns_body);
       }
 
       function calcHeightWindow(id){
@@ -41,7 +41,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         if (indexOfTagName == -1){
           document.getElementById(id).style.background="#ADFF2F";
           tagList.push(id);
-          $('#SelectedTag_Body_TableBody').append("<tr id=\"line_"+ id +"\"><td>" + id + "</td><td><div class=\"btn btn-xs btn-danger\" id=\"deleteBtn/" + id +"\" onclick=\"deleteTag(id)\">X</div></td></tr>");
+          $('#selectedTag_body_table_body').append("<tr id=\"line_"+ id +"\"><td>" + id + "</td><td><div class=\"btn btn-xs btn-danger\" id=\"deleteBtn/" + id +"\" onclick=\"deleteTag(id)\">X</div></td></tr>");
         }
         else{
           $('#line_'+ id).remove();
@@ -65,7 +65,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var stringToServer = "";
 
         resetVariableAndDiv();
-        $('#globalSearchCampWarning').remove();
+        $('#globalSearchWarning').empty();
         
         var inputValue = $('#globalSearchForm').val();
         var inputValueSplit = inputValue.split(" ");
@@ -76,7 +76,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         //console.log(listOfTagString);
 
         if(searchCampString == ""){
-          $("<p id=\"globalSearchCampWarning\"class=\"text-danger small\">*missing string</p>").appendTo('#globalSearch');
+          $('#globalSearchWarning').text('*');
         }
         else if (listOfTagString == ""){
           stringToServer = "/keys/" + searchCampString;
@@ -94,9 +94,9 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
       function resetVariableAndDiv(){
         $('#emptyResultWarning').remove();
-        $('#sectionResult_body_Tab').empty();
-        $('#sectionResult_body_Content').empty();
-        $('#SelectedColumns_Body').empty();
+        $('#sectionResult_body_tab').empty();
+        $('#sectionResult_body_content').empty();
+        $('#listingColumns_body').empty();
       }
 
       function setStringOfKeys(inputValueSplit){
@@ -144,10 +144,10 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         $('.myChart').hide();
         
         $('#indexColumn_0').show();
-        $('#sectionResult_body_Content_li_0').addClass('active');  
-        $('#sectionResult_body_Content_0').addClass('active');
+        $('#sectionResult_body_content_li_0').addClass('active');  
+        $('#sectionResult_body_content_0').addClass('active');
         $('#sectionResult_header_switchSection_table').addClass('active');       
-        
+        switchContent("content0");
         $('a[href="#Result"]').tab('show');
       }
 
@@ -161,10 +161,16 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
       function tableToDataTableHeader(dataTable){
         // console.log(dataTable);
-        return dataTable.header.map(function(columnName){
-          // console.log(columnName);
-          return {title:columnName};
-        });
+        if(dataTable.header != undefined){
+          return dataTable.header.map(function(columnName){
+            // console.log(columnName);
+            return {title:columnName};
+          });
+        }
+        else{
+          $('#sectionResult_body').append('<h1>No result! Try with other params.</h1>');
+          return;
+        }
       }
 
       function createResultTab(id, show_id ){
@@ -175,22 +181,22 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
         var hSectionResult_body = hWindow-hNavBar-hSectionTab-hSectionResult_header-158;
 
-        $("<li class=\"text-center\" id=\"sectionResult_body_Content_li_"+ id +"\"><a href=\"#sectionResult_body_Content_"+ id +"\" data-toggle=\"tab\" id=\"sectionResult_body_Content"+ id +"\" onclick=\"switchContent(id)\">"+ show_id +"</a></li>").appendTo('#sectionResult_body_Tab');
-        $("<div class=\"tab-pane fade in\" style=\"overflow:auto; max-height:"+ hSectionResult_body +"px\" id=\"sectionResult_body_Content_"+ id +"\"></div>").appendTo('#sectionResult_body_Content'); 
+        $("<li class=\"text-center\" id=\"sectionResult_body_content_li_"+ id +"\"><a href=\"#sectionResult_body_content_"+ id +"\" data-toggle=\"tab\" id=\"sectionResult_body_content"+ id +"\" onclick=\"switchContent(id)\">"+ show_id +"</a></li>").appendTo('#sectionResult_body_tab');
+        $("<div class=\"tab-pane fade in\" style=\"overflow:auto; max-height:"+ hSectionResult_body +"px\" id=\"sectionResult_body_content_"+ id +"\"></div>").appendTo('#sectionResult_body_content'); 
       }
 
       function createResultTable(table, id){
-        $("<div id=\"table_"+id+"\" class=\"myTable\" style=\"overfloaw:auto ; height:100%\"></div>").appendTo('#sectionResult_body_Content_'+ id);
+        $("<div id=\"table_"+id+"\" class=\"myTable\" style=\"overfloaw:auto ; height:100%\"></div>").appendTo('#sectionResult_body_content_'+ id);
         $("<table border=\"3\" class=\"table table-striped table-condensed\" id=\"example"+ id +"\"></table>").appendTo('#table_'+ id);
         $('#example'+ id).dataTable(table);
       }
 
       function createResultChart(table, id){
-        $("<div id=\"chart_"+ id +"\" class=\"myChart\" style=\"height:100% ; width:100%\"></div>").appendTo('#sectionResult_body_Content_'+ id);
+        $("<div id=\"chart_"+ id +"\" class=\"myChart\" style=\"height:100% ; width:100%\"></div>").appendTo('#sectionResult_body_content_'+ id);
       }
 
       function createColumnsSides(table, id){
-          $("<div id=\"indexColumn_"+ id +"\" class=\"myIndexColumn\" style=\"margin-left:8px;\"></div>").appendTo('#SelectedColumns_Body');
+          $("<div id=\"indexColumn_"+ id +"\" class=\"myIndexColumn\" style=\"margin-left:8px;\"></div>").appendTo('#listingColumns_body');
           
           $.each(table.columns, function(index, value){
             $("<label class=\"checkbox\"><p class=\"myIndexCheckbox\"><input type=\"checkbox\" id=\"indexColumn_"+ id +"_"+ value.title +"_"+ index +"\" onclick=\"hideShowColumnTable(id)\">"+ value.title +"</label>").appendTo('#indexColumn_'+ id);
@@ -225,9 +231,8 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         //dal server, insieme ai dati viene inviato per ciascun grafico, l'indice dell'elemento di riferimento per l'asse x ed la sottostringa degli elementi da graficare nel chartS
         var keys = Object.keys(dati);
         var tableName = keys[id];
-
-        var hsectionResult_body_Tab = calcHeightWindow('#sectionResult_body_Tab');
-        var hMaxListingTag_Body = $('#listingTag_Body').css('max-height');
+        var hsectionResult_body_tab = calcHeightWindow('#sectionResult_body_tab');
+        var hMaxListingTag_body = $('#listingTag_body').css('max-height');
 
         var columnIndexes = filterColumnsForChart(table, id, dati[tableName]['hAxis'], dati[tableName]['stringColumns']);
         var header = generateHeaderForChart(table, id, columnIndexes);
@@ -235,13 +240,10 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         rows = changeRowsFromStringToNumber(rows);
         var googleDataTable = dataTableToGoogleChartDataTable(header, rows, id);
         
-        var hChart = hMaxListingTag_Body.split("px")[0] - hsectionResult_body_Tab - 20;
-        var wChart = $('#sectionResult_body_Content').width() - 20;
+        var hChart = hMaxListingTag_body.split("px")[0] - hsectionResult_body_tab - 20;
+        var wChart = $('#sectionResult_body_content').width() - 20;
 
         var options = {
-              chart: {
-                title: tableName
-              },
               height: hChart,
               width: wChart,
               legend: {
@@ -302,7 +304,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       }
 
       function switchTableChart(id){
-        var idSectionActive= $('#sectionResult_body_Tab').children('.active').attr('id');
+        var idSectionActive= $('#sectionResult_body_tab').children('.active').attr('id');
         var idForSwitchContent = idSectionActive.split("_")[2]+idSectionActive.split("_")[4];
         var buttonName = id.split("_")[3];
 
@@ -318,7 +320,8 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       }
 
       function switchContent(id){
-        var index = id.split('Content')[1];
+        $('#sectionResult_header_filepath').empty();
+        var index = id.split('content')[1];
 
         var keys = Object.keys(dati);
         var tableName = keys[index];
@@ -327,6 +330,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var hAxis = dati[tableName]['hAxis'];
         var stringColumns = dati[tableName]['stringColumns'];
         
+        $('#sectionResult_header_filepath').text(tableName);
         $('.myIndexColumn').hide();
         $('.myTable').hide();
         $('.myChart').hide();
@@ -345,9 +349,10 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
           $('.myIndexCheckbox').show();
 
           setEmptyWarning();
-          setValueInSelectColumnsForChart('', '');      
+          setValueInSelectColumnsForChart(dati[tableName].header[hAxis], stringColumns);    
         }
         else{
+          $('.myChart').hide();
           setValueInSelectColumnsForChart('', '');
           sendStringsForChart();
         }
@@ -355,13 +360,13 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       }
 
       function setValueInSelectColumnsForChart(hAxisForm,ColumnsForm){
-        $('#SelectColumnsForChart_Body_HaxisForm').val(hAxisForm);
-        $('#SelectColumnsForChart_Body_ColumnsForm').val(ColumnsForm);  
+        $('#selectColumnsForChart_body_haxisForm').val(hAxisForm);
+        $('#selectColumnsForChart_body_columnsForm').val(ColumnsForm);  
       }
 
       function setEmptyWarning(){
-        $('#SelectColumnsForChart_Body_HaxisForm_Warning').empty();
-        $('#SelectColumnsForChart_Body_ColumnsForm_Warning').empty();
+        $('#selectColumnsForChart_body_haxisForm_warning').empty();
+        $('#selectColumnsForChart_body_columnsForm_warning').empty();
       }
 
       function filterDivColumnForChart(table, id, indexHaxis, substring){
@@ -378,12 +383,10 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       }
 
       function sendStringsForChart(){
-        var idSectionActive= $('#sectionResult_body_Tab').children('.active').attr('id');
+        var idSectionActive= $('#sectionResult_body_tab').children('.active').attr('id');
         var index = idSectionActive.split("_")[4];
         var keys = Object.keys(dati);
         var tableName = keys[index];
-        //dati[tableName]['hAxis'] = undefined;
-        //dati[tableName]['stringColumns'] = undefined;
         
         setEmptyWarning();
         
@@ -392,48 +395,71 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       }
 
       function setHaxisValue(filepath){
-        var stringHaxis = "";
-
-        if( $('#SelectColumnsForChart_Body_HaxisForm').val() != "" ){
-          stringHaxis = $('#SelectColumnsForChart_Body_HaxisForm').val();
+        var stringHaxis = $('#selectColumnsForChart_body_haxisForm').val();
+        
+        if( stringHaxis != "" ){
           stringHaxis = stringHaxis.split(" ")[0];
-          var index = (dati[filepath]['header']).indexOf(stringHaxis);
+          var headers = dati[filepath]['header'];
+          var index = headers.indexOf(stringHaxis);
+          var data = dati[filepath]['data'];
+          var firstRowData = data[0];
+          var firstRowDataIndexElement = firstRowData[index];
+          var firstRowDataIndexElementNumeric = Number(firstRowDataIndexElement);
 
-          if( (index != -1) & isNaN(Number(dati[filepath]['data'][0][index])) ){
+          if( (index != -1) & isNaN(firstRowDataIndexElementNumeric) ){
             dati[filepath]['hAxis'] = index;
           }
           else{
-            $('#SelectColumnsForChart_Body_HaxisForm_Warning').text("*Not valid input.");
+            $('#selectColumnsForChart_body_haxisForm_warning').text("*Not valid input.");
           }
         }
 
         else{
-          $('#SelectColumnsForChart_Body_HaxisForm_Warning').text("*missing input.");
+          $('#selectColumnsForChart_body_haxisForm_warning').text("*missing input.");
         }
       }
 
       function setStringOfColumns(filepath){
-        var stringColumns = "";
-        if( $('#SelectColumnsForChart_Body_ColumnsForm').val() != "" ){
-          stringColumns = $('#SelectColumnsForChart_Body_ColumnsForm').val();
-          stringColumns = stringColumns.split(" ")[0];
-          var stringOfHaxis = $('#SelectColumnsForChart_Body_HaxisForm').val();
-          /*console.log(stringOfHaxis);
-          console.log(stringColumns);
-          $.each(dati[filepath]['header'], function(index,value){
-            console.log(index);
-            console.log(value);
-          });
-          */
+        var stringColumns = $('#selectColumnsForChart_body_columnsForm').val();
+        var stringOfHaxis = $('#selectColumnsForChart_body_haxisForm').val();
+
+        if( stringColumns != "" ){
+          stringColumns = stringColumns.split(" ")[0];          
+          
           if(stringColumns != stringOfHaxis){
-            dati[filepath]['stringColumns'] = stringColumns;
-            switchTableChart('sectionResult_header_switchSection_chart');
+            var matched = false;
+            var headers = dati[filepath]['header'];
+            var data = dati[filepath]['data'];
+            var firstRowData = data[0];
+
+            $.each(headers, function(index,value){
+              var indexMatched = value.search(stringColumns);
+              var firstRowDataIndexElement = firstRowData[index];
+              var firstRowDataIndexElementNumeric = Number(firstRowDataIndexElement);
+
+              if((indexMatched != -1) && !(isNaN(firstRowDataIndexElementNumeric)) ){
+                matched = true;
+                return;
+              }
+            });
+            
+            if( matched ){
+              dati[filepath]['stringColumns'] = stringColumns;
+              switchTableChart('sectionResult_header_switchSection_chart');
+            }
+            else{
+              dati[filepath]['stringColumns'] = undefined;
+              $('#selectColumnsForChart_body_columnsForm_warning').text("*Not valid input. type of values are not numeric.");
+              $('.myChart').hide();
+            }
           }
+
           else{
-            $('#SelectColumnsForChart_Body_ColumnsForm_Warning').text("*Not valid input.");
+            dati[filepath]['stringColumns'] = undefined;
+            $('#selectColumnsForChart_body_columnsForm_warning').text("*Not valid input. string is equal to hAxis.");
           }
         }
         else{
-          $('#SelectColumnsForChart_Body_ColumnsForm_Warning').text("*missing input.");
+          $('#selectColumnsForChart_body_columnsForm_warning').text("*missing input.");
         }
-      }
+      } 
