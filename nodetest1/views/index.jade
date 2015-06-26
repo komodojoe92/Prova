@@ -24,13 +24,11 @@ html
         div
           ul.nav.navbar-nav.col-lg-2
           ul.nav.navbar-nav.col-lg-8
-            form.navbar-form(role='search', style='width:100%;')
+            form.navbar-form.form-inline(role='search', style='width:90%;')
               #globalSearch.form-search
-                input#globalSearchAdd(type="checkbox", name="add", text="addA").form-control
-                |  Add 
+                label#globalSearchWarning.text-danger(for='globalSearchForm;' style='margin-right:3px;')
                 input#globalSearchForm.form-control(type='search', placeholder='Enter for search', style='width:75%;')
                 button#globalSearchButton.btn.btn-primary(style='margin-left:5px;' type='button' onclick='sendList()') Enter
-          ul.nav.navbar-nav.col-lg-2
     .container-fluid
       .row
         .col-lg-12
@@ -54,18 +52,18 @@ html
                      #listingTag.panel.panel-default
                         #listingTag_header.panel-heading(style='height:40px;')
                           strong ListingTag
-                        #listingTag_Body.panel-body(style='overflow:auto;')
+                        #listingTag_body.panel-body(style='overflow:auto;')
                     .col-lg-4
-                      #SelectedTag.panel.panel-default(style='overflow:auto;')
-                        #SelectedTag_header.panel-heading(style='height:40px;')
+                      #selectedTag.panel.panel-default(style='overflow:auto;')
+                        #selectedTag_header.panel-heading(style='height:40px;')
                           strong SelectedTag
-                        #SelectedTag_Body.panel-body
+                        #selectedTag_body.panel-body
                           .container-fluid
-                            table#SelectedTag_Body_Table.table.table-striped.table-condensed
+                            table#selectedTag_body_table.table.table-striped.table-condensed
                               thead
                                 tr
                                   th TagName
-                              tbody#SelectedTag_Body_TableBody
+                              tbody#selectedTag_body_table_body
                 #GenomeBrowser.tab-pane.fade
                 #Result.tab-pane.fade
                   .row
@@ -73,40 +71,37 @@ html
                       #sectionResult.panel.panel-default
                         #sectionResult_header.panel-heading(style='height:50px;')
                           .row
-                            .col-lg-4
+                            .col-lg-1
                               ul.list-inline
                                 li
                                   #sectionResult_header_instruments.dropdown
-                                    button#sectionResult_header_instrumentsButton.btn.btn-default.btn-sm.dropdown-toggle(type='button', data-toggle='dropdown')
-                                      | Instruments
+                                    button#sectionResult_header_optionsButton.btn.btn-default.btn-sm.dropdown-toggle(type='button', data-toggle='dropdown')
+                                      | Options
                                       span.caret
-                                    ul#sectionResult_header_instrumentsMenu.dropdown-menu(role='menu')
-                                li
-                                  #sectionResult_header_displays.dropdown
-                                    button#sectionResult_header_displaysButton.btn.btn-default.btn-sm.dropdown-toggle(type='button', data-toggle='dropdown')
-                                      | Displays
-                                      span.caret
-                                    ul#sectionResult_header_displaysMenu.dropdown-menu(role='menu')
-                            .col-lg-6
+                                    ul#sectionResult_header_optionsMenu.dropdown-menu(role='menu')
+                            .col-lg-9
+                              p#sectionResult_header_filepath.small(style='word-wrap: break-word;')
                             .col-lg-2
                               button#sectionResult_header_switchSection_table.btn.btn-default.btn-sm(data-toggle='tab' style='width:50%;' onclick='switchTableChart(id)') Table
                               button#sectionResult_header_switchSection_chart.btn.btn-default.btn-sm(data-toggle='tab' style='width:50%;' onclick='switchTableChart(id)') Chart
                         #sectionResult_body.panel-body
                           .container-fluid
-                            ul#sectionResult_body_Tab.nav.nav-tabs.nav-justified
+                            ul#sectionResult_body_tab.nav.nav-tabs.nav-justified
                             p
-                            #sectionResult_body_Content.tab-content(style='overflow:auto;')
+                            #sectionResult_body_content.tab-content(style='overflow:auto;')
                     .col-lg-2
-                      #SelectColumnsForChart.panel.panel-default
-                        #SelectColumnsForChart_header.panel-heading(style='height:40px;')
-                          strong ColumnsForChart
-                        #SelectColumnsForChart_Body.panel-body
-                          input#SelectColumnsForChart_Body_HaxisForm.form-control.input-sm(type='search', placeholder='Enter vAxis', style='width:100%;')
-                          p#SelectColumnsForChart_Body_HaxisForm_Warning.text-danger.small(style='height:8px;')
-                          input#SelectColumnsForChart_Body_ColumnsForm.form-control.input-sm(type='search', placeholder='Enter string', style='width:100%;')
-                          p#SelectColumnsForChart_Body_ColumnsForm_Warning.text-danger.small(style='height:8px;')
-                          button#SelectColumnsForChart_Body_EnterButton.btn.btn-primary.btn-sm(type='button' style='float: right;' onclick='sendStringsForChart()') Enter
-                      #SelectedColumns.panel.panel-default
-                        #SelectedColumns_header.panel-heading(style='height:40px;')
-                          strong SelectedColumns
-                        #SelectedColumns_Body.panel-body(style='overflow:auto;')
+                      #selectColumnsForChart.panel.panel-default
+                        #selectColumnsForChart_header.panel-heading(style='height:40px;')
+                          strong MakeChart
+                        #selectColumnsForChart_body.panel-body
+                          label(for='selectColumnsForChart_body_haxisForm;' style='height:5px;') column's name
+                          input#selectColumnsForChart_body_haxisForm.form-control.input-sm(type='search', placeholder='hAxis', style='width:100%;')
+                          p#selectColumnsForChart_body_haxisForm_warning.text-danger.small(style='height:8px;')
+                          label(for='selectColumnsForChart_body_columnsForm;' style='height:5px;') substring group
+                          input#selectColumnsForChart_body_columnsForm.form-control.input-sm(type='search', placeholder='substring', style='width:100%;')
+                          p#selectColumnsForChart_body_columnsForm_warning.text-danger.small(style='height:8px;')
+                          button#SelectColumnsForChart_body_enterButton.btn.btn-primary.btn-sm(type='button' style='float: right;' onclick='sendStringsForChart()') Enter
+                      #listingColumns.panel.panel-default
+                        #listingColumns_header.panel-heading(style='height:40px;')
+                          strong ListingColumns
+                        #listingColumns_body.panel-body(style='overflow:auto;')
