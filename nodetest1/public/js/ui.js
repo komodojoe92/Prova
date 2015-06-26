@@ -20,11 +20,15 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var hSelectedTag_header= calcHeightWindow('#selectedTag_header');
         var hSectionResult_header = calcHeightWindow('#sectionResult_header');
         var hListingColumns_header = calcHeightWindow('#listingColumns_header');
-        var hSelectColumnsForChart = 230;
+        
+        var hSelectColumnsForChart = calcHeightWindow('#selectColumnsForChart');
+        if(hSelectColumnsForChart <= 0){
+          hSelectColumnsForChart = 218;
+        }
 
         var hListingTag_body = hWindow-hNavBar-hSectionTab-hListingTag_header-75;
         var hSelectedTag_body = hWindow-hNavBar-hSectionTab-hSelectedTag_header-75;
-        var hListingColumns_body = hWindow-hNavBar-hSectionTab-hSelectColumnsForChart-hListingColumns_header-103;
+        var hListingColumns_body = hWindow-hNavBar-hSectionTab-hSelectColumnsForChart-hListingColumns_header-100;
 
         $('#listingTag_body').css("max-height", hListingTag_body);
         $('#selectedTag_body').css("max-height",hSelectedTag_body);
@@ -97,6 +101,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         $('#sectionResult_body_tab').empty();
         $('#sectionResult_body_content').empty();
         $('#listingColumns_body').empty();
+        $('#selectColumnsForChart_body').empty();
       }
 
       function setStringOfKeys(inputValueSplit){
@@ -138,12 +143,15 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
           createResultTable(dataTable, index);
           createResultChart(dataTable, index);
           createColumnsSides(dataTable,index);
+          createSectionColumnsForChart(dataTable,index);
         });
         
         $('.myIndexColumn').hide();
         $('.myChart').hide();
+        $('.mySectionColumnsForChart').hide();
         
         $('#indexColumn_0').show();
+        $('#sectionColumnsForChart_0').show();
         $('#sectionResult_body_content_li_0').addClass('active');  
         $('#sectionResult_body_content_0').addClass('active');
         $('#sectionResult_header_switchSection_table').addClass('active');       
@@ -196,12 +204,40 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       }
 
       function createColumnsSides(table, id){
-          $("<div id=\"indexColumn_"+ id +"\" class=\"myIndexColumn\" style=\"margin-left:8px;\"></div>").appendTo('#listingColumns_body');
+        $("<div id=\"indexColumn_"+ id +"\" class=\"myIndexColumn\" style=\"margin-left:8px;\"></div>").appendTo('#listingColumns_body');
           
-          $.each(table.columns, function(index, value){
-            $("<label class=\"checkbox\"><p class=\"myIndexCheckbox\"><input type=\"checkbox\" id=\"indexColumn_"+ id +"_"+ value.title +"_"+ index +"\" onclick=\"hideShowColumnTable(id)\">"+ value.title +"</label>").appendTo('#indexColumn_'+ id);
-            $('#indexColumn_'+ id +'_'+value.title +"_"+ index).prop('checked', true);
-          });
+        $.each(table.columns, function(index, value){
+          $("<label class=\"checkbox\"><p class=\"myIndexCheckbox\"><input type=\"checkbox\" id=\"indexColumn_"+ id +"_"+ value.title +"_"+ index +"\" onclick=\"hideShowColumnTable(id)\">"+ value.title +"</label>").appendTo('#indexColumn_'+ id);
+          $('#indexColumn_'+ id +'_'+value.title +"_"+ index).prop('checked', true);
+        });
+      }
+
+      function createSectionColumnsForChart(table,id){
+        var keys = Object.keys(dati);
+        var tableName = keys[id];
+        var headers = dati[tableName]['header'];
+        var stringColumns = dati[tableName]['stringColumns']
+
+        $("<div id=\"sectionColumnsForChart_"+ id +"\" class=\"mySectionColumnsForChart\"></div>").appendTo('#selectColumnsForChart_body');
+
+        $("<label for=\"selectColumnsForChart_body_haxisForm_"+ id +";\" style=\"height:5px;\">column\'s name</label>").appendTo('#sectionColumnsForChart_'+ id);
+        $("<select id=\"selectColumnsForChart_body_haxisForm_"+ id +"\" class=\"form-control\"></select>").appendTo('#sectionColumnsForChart_'+ id);
+
+        $.each(headers, function(index,value){
+          var dataElement = table['data'][0][index];
+          var elementNumeric = Number(dataElement);
+          if( isNaN(elementNumeric) && dataElement!="OK" && dataElement!="-"){
+            $("<option>"+ value +"</option>").appendTo('#selectColumnsForChart_body_haxisForm_'+ id);
+          }
+        });
+
+        $("<label for=\"selectColumnsForChart_body_columnsForm_"+ id +";\" style=\"height:5px;\">substring group</label>").appendTo('#sectionColumnsForChart_'+ id);
+        $("<input id=\"selectColumnsForChart_body_columnsForm_"+ id +"\" class=\"form-control\"><span class=\"label label-danger glyphicon glyphicon-remove\" id=\"selectColumnsForChart_body_columnsForm_Warning_"+ id +"\"> inputError.</span></input>").appendTo('#sectionColumnsForChart_'+ id);          
+        $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).hide();
+        $("#selectColumnsForChart_body_columnsForm_"+ id).val(stringColumns);
+        $("<p></p><button id=\"SelectColumnsForChart_body_enterButton"+ id +"\" class=\"btn btn-primary btn-sm\" type=\"button\" style=\"float:right;\" onclick=\"sendStringsForChart()\">Enter</button>").appendTo('#sectionColumnsForChart_'+ id);
+
+
       }
   
       function hideShowColumnTable(id){
@@ -334,39 +370,28 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         $('.myIndexColumn').hide();
         $('.myTable').hide();
         $('.myChart').hide();
+        $('.mySectionColumnsForChart').hide();
 
-        if( $('#sectionResult_header_switchSection_chart').is('.active') && (hAxis != undefined) && (stringColumns != undefined) ){
+        if( $('#sectionResult_header_switchSection_chart').is('.active') ){
           $('#chart_'+ index).show();
           $(".myIndexCheckbox").show();
-          setEmptyWarning();
-          setValueInSelectColumnsForChart(dati[tableName].header[hAxis], stringColumns);
+
+          setValueInSelectColumnsForChart(id, dati[tableName].header[hAxis], stringColumns);
           filterDivColumnForChart(dati[tableName], index, hAxis, stringColumns);
           drawGoogleChart(dataTable,index);
         }
-        else if ($('#sectionResult_header_switchSection_table').is('.active')){
-          //console.log('table');
-          $('#table_'+index).show();
-          $('.myIndexCheckbox').show();
-
-          setEmptyWarning();
-          setValueInSelectColumnsForChart(dati[tableName].header[hAxis], stringColumns);    
-        }
         else{
-          $('.myChart').hide();
-          setValueInSelectColumnsForChart('', '');
-          sendStringsForChart();
+          $('#table_'+index).show();
+          $('.myIndexCheckbox').show();    
         }
+        setValueInSelectColumnsForChart(id, dati[tableName].header[hAxis], stringColumns);
         $('#indexColumn_'+ index).show();
+        $('#sectionColumnsForChart_'+ index).show();
       }
 
-      function setValueInSelectColumnsForChart(hAxisForm,ColumnsForm){
-        $('#selectColumnsForChart_body_haxisForm').val(hAxisForm);
-        $('#selectColumnsForChart_body_columnsForm').val(ColumnsForm);  
-      }
-
-      function setEmptyWarning(){
-        $('#selectColumnsForChart_body_haxisForm_warning').empty();
-        $('#selectColumnsForChart_body_columnsForm_warning').empty();
+      function setValueInSelectColumnsForChart(id, hAxisForm,ColumnsForm){
+        $('#selectColumnsForChart_body_haxisForm_'+ id).val(hAxisForm);
+        $('#selectColumnsForChart_body_columnsForm_'+ id).val(ColumnsForm);  
       }
 
       function filterDivColumnForChart(table, id, indexHaxis, substring){
@@ -388,49 +413,29 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var keys = Object.keys(dati);
         var tableName = keys[index];
         
-        setEmptyWarning();
-        
-        setHaxisValue(tableName);
-        setStringOfColumns(tableName);
+        setHaxisValue(index,tableName);
+        setStringOfColumns(index,tableName);
       }
 
-      function setHaxisValue(filepath){
-        var stringHaxis = $('#selectColumnsForChart_body_haxisForm').val();
-        
-        if( stringHaxis != "" ){
-          stringHaxis = stringHaxis.split(" ")[0];
-          var headers = dati[filepath]['header'];
-          var index = headers.indexOf(stringHaxis);
-          var data = dati[filepath]['data'];
-          var firstRowData = data[0];
-          var firstRowDataIndexElement = firstRowData[index];
-          var firstRowDataIndexElementNumeric = Number(firstRowDataIndexElement);
+      function setHaxisValue(id,filepath){
+         var stringHaxis = $('#selectColumnsForChart_body_haxisForm_'+ id).val();
+         var headers = dati[filepath]['header'];
+         var index = headers.indexOf(stringHaxis);
 
-          if( (index != -1) & isNaN(firstRowDataIndexElementNumeric) ){
-            dati[filepath]['hAxis'] = index;
-          }
-          else{
-            $('#selectColumnsForChart_body_haxisForm_warning').text("*Not valid input.");
-          }
-        }
-
-        else{
-          $('#selectColumnsForChart_body_haxisForm_warning').text("*missing input.");
-        }
+         dati[filepath]['hAxis'] = index;
       }
 
-      function setStringOfColumns(filepath){
-        var stringColumns = $('#selectColumnsForChart_body_columnsForm').val();
-        var stringOfHaxis = $('#selectColumnsForChart_body_haxisForm').val();
+      function setStringOfColumns(id, filepath){
+        var stringColumns = $('#selectColumnsForChart_body_columnsForm_'+ id).val();
+        var stringOfHaxis = $('#selectColumnsForChart_body_haxisForm_'+ id).val();
+        $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).hide();
 
         if( stringColumns != "" ){
-          stringColumns = stringColumns.split(" ")[0];          
-          
-          if(stringColumns != stringOfHaxis){
             var matched = false;
             var headers = dati[filepath]['header'];
             var data = dati[filepath]['data'];
             var firstRowData = data[0];
+            stringColumns = stringColumns.split(" ")[0];
 
             $.each(headers, function(index,value){
               var indexMatched = value.search(stringColumns);
@@ -448,18 +453,12 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
               switchTableChart('sectionResult_header_switchSection_chart');
             }
             else{
-              dati[filepath]['stringColumns'] = undefined;
-              $('#selectColumnsForChart_body_columnsForm_warning').text("*Not valid input. type of values are not numeric.");
-              $('.myChart').hide();
+              $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).show();
             }
-          }
-
-          else{
-            dati[filepath]['stringColumns'] = undefined;
-            $('#selectColumnsForChart_body_columnsForm_warning').text("*Not valid input. string is equal to hAxis.");
-          }
         }
         else{
-          $('#selectColumnsForChart_body_columnsForm_warning').text("*missing input.");
+          $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).show();
+          switchTableChart('sectionResult_header_switchSection_chart');
         }
-      } 
+        setHeightWindows();
+      }
