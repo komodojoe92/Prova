@@ -26,7 +26,7 @@ html
           ul.nav.navbar-nav.col-lg-8
             form.navbar-form.form-inline(role='search', style='width:90%;')
               #globalSearch.form-search
-                label#globalSearchWarning.text-danger(for='globalSearchForm;' style='margin-right:3px;')
+                span#globalSearchWarning.label.label-danger.glyphicon.glyphicon-remove(style='margin-right:3px;')
                 input#globalSearchForm.form-control(type='search', placeholder='Enter for search', style='width:75%;')
                 button#globalSearchButton.btn.btn-primary(style='margin-left:5px;' type='button' onclick='sendList()') Enter
     .container-fluid
