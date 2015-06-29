@@ -1,11 +1,11 @@
 google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
       
-      var tagList=[];
+      var tagList = [];
       var dati;
 
       $(document).ready(function() {
         setHeightWindows();
-        $.getJSON(webserver+'/tags', function(data){
+        $.getJSON(webserver +'/tags', function(data){
           $.each(data, function(index,value){
             $("<div class=\"btn btn-default\" id=\""+ value +"\" style=\"margin-bottom:12px;margin-left:12px;\" onclick=\"selectionTag(id)\">" + value +"</div>").appendTo('#listingTag_body');
           })
@@ -69,28 +69,28 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var stringToServer = "";
 
         resetVariableAndDiv();
-        $('#globalSearchWarning').empty();
+        $('#globalSearchWarning').hide();
         
         var inputValue = $('#globalSearchForm').val();
         var inputValueSplit = inputValue.split(" ");
 
         searchCampString = setStringOfKeys(inputValueSplit);
         listOfTagString = setStringOfKeys(tagList);
-        //console.log(searchCampString);
-        //console.log(listOfTagString);
 
         if(searchCampString == ""){
-          $('#globalSearchWarning').text('*');
+          $('#globalSearchWarning').show();
         }
+
         else if (listOfTagString == ""){
           stringToServer = "/keys/" + searchCampString;
         }
+
         else{
           searchCampString = "/keys/" + searchCampString;
           listOfTagString = "/tags/" + listOfTagString;
           stringToServer = listOfTagString + searchCampString;
         }
-        //console.log(stringToServer);
+
         $.getJSON(webserver+stringToServer, function(data){
             showTableChart(data);
           });
@@ -98,6 +98,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
       function resetVariableAndDiv(){
         $('#emptyResultWarning').remove();
+        $('#sectionResult_header_switchSection_chart').removeClass('active'); 
         $('#sectionResult_body_tab').empty();
         $('#sectionResult_body_content').empty();
         $('#listingColumns_body').empty();
@@ -128,13 +129,13 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
 
       function createResults(tables){
         var keys = Object.keys(tables);
+        
         if(keys.length == 0){
           //console.log(keys.length);
           $("<p id=\"emptyResultWarning\"class=\"text-danger\">*No result! Please, retry with other params.</p>").appendTo('#sectionResult_body');
           return;
         }
-        // console.log(keys);
-        // console.log(tables)
+
         $.each(keys, function(index,value){
           var tableName = keys[index];
           var dataTable = tableToDataTable(tables[tableName]);
@@ -150,12 +151,7 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         $('.myChart').hide();
         $('.mySectionColumnsForChart').hide();
         
-        $('#indexColumn_0').show();
-        $('#sectionColumnsForChart_0').show();
-        $('#sectionResult_body_content_li_0').addClass('active');  
-        $('#sectionResult_body_content_0').addClass('active');
-        $('#sectionResult_header_switchSection_table').addClass('active');       
-        switchContent("content0");
+        showDivOfFirstKey();
         $('a[href="#Result"]').tab('show');
       }
 
@@ -236,8 +232,15 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).hide();
         $("#selectColumnsForChart_body_columnsForm_"+ id).val(stringColumns);
         $("<p></p><button id=\"SelectColumnsForChart_body_enterButton"+ id +"\" class=\"btn btn-primary btn-sm\" type=\"button\" style=\"float:right;\" onclick=\"sendStringsForChart()\">Enter</button>").appendTo('#sectionColumnsForChart_'+ id);
+      }
 
-
+      function showDivOfFirstKey(){
+        $('#indexColumn_0').show();
+        $('#sectionColumnsForChart_0').show();
+        $('#sectionResult_body_content_li_0').addClass('active');  
+        $('#sectionResult_body_content_0').addClass('active');
+        $('#sectionResult_header_switchSection_table').addClass('active');       
+        switchContent("content0");
       }
   
       function hideShowColumnTable(id){
@@ -320,7 +323,6 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
           return columnIndexes.map(function(col_index, index, columns){
             return row_data[col_index];
           });
-
         });
       }
 
@@ -413,11 +415,11 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
         var keys = Object.keys(dati);
         var tableName = keys[index];
         
-        setHaxisValue(index,tableName);
-        setStringOfColumns(index,tableName);
+        setIndexOfHaxisValue(index,tableName);
+        setStringOfColumnsChart(index,tableName);
       }
 
-      function setHaxisValue(id,filepath){
+      function setIndexOfHaxisValue(id,filepath){
          var stringHaxis = $('#selectColumnsForChart_body_haxisForm_'+ id).val();
          var headers = dati[filepath]['header'];
          var index = headers.indexOf(stringHaxis);
@@ -425,9 +427,9 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
          dati[filepath]['hAxis'] = index;
       }
 
-      function setStringOfColumns(id, filepath){
+      function setStringOfColumnsChart(id, filepath){
         var stringColumns = $('#selectColumnsForChart_body_columnsForm_'+ id).val();
-        var stringOfHaxis = $('#selectColumnsForChart_body_haxisForm_'+ id).val();
+        //var stringOfHaxis = $('#selectColumnsForChart_body_haxisForm_'+ id).val();
         $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).hide();
 
         if( stringColumns != "" ){
@@ -460,5 +462,5 @@ google.load('visualization', '1.1', {packages: ['corechart', 'bar']});
           $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).show();
           switchTableChart('sectionResult_header_switchSection_chart');
         }
-        setHeightWindows();
+      setHeightWindows();
       }
