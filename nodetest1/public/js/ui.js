@@ -77,7 +77,9 @@ function sendList(){
   listOfTagString = setStringOfKeys(tagList);
 
   if(searchCampString == ""){
+    $('#globalSearchWarning').text("inputError.");
     $('#globalSearchWarning').show();
+    return;
   }
 
   else if (listOfTagString == ""){
@@ -91,7 +93,7 @@ function sendList(){
   }
 
   $.getJSON(webserver+stringToServer, function(data){
-      showTableChart(data);
+      createResults(data);
     });
  } 
 
@@ -102,6 +104,8 @@ function resetVariableAndDiv(){
   $('#sectionResult_body_content').empty();
   $('#listingColumns_body').empty();
   $('#selectColumnsForChart_body').empty();
+  $('#sectionResult_header_filepath').empty();
+  $('#globalSearchWarning').empty();
 }
 
 function setStringOfKeys(inputValueSplit){
@@ -121,12 +125,8 @@ function deleteLastThreeCharacters(string){
   return string.substring(0, string.length-3);
 }
 
-function showTableChart(tables){
-  dati = tables;
-  createResults(tables);
-}
-
 function createResults(tables){
+  dati = tables;
   var keys = Object.keys(tables);
   
   if(keys.length == 0){
@@ -142,8 +142,8 @@ function createResults(tables){
     createResultTab(index, index);
     createResultTable(dataTable, index);
     createResultChart(dataTable, index);
-    createColumnsSides(dataTable,index);
-    createSectionColumnsForChart(dataTable,index);
+    createColumnsSides(dataTable, index);
+    createSectionColumnsForChart(dataTable, index);
   });
   
   $('.myIndexColumn').hide();
@@ -163,10 +163,8 @@ function tableToDataTableBody(dataTable){
 }
 
 function tableToDataTableHeader(dataTable){
-  // console.log(dataTable);
   if(dataTable.header != undefined){
     return dataTable.header.map(function(columnName){
-      // console.log(columnName);
       return {title:columnName};
     });
   }
