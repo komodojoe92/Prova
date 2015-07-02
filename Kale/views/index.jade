@@ -20,13 +20,13 @@ html
     nav#navBar.navbar.navbar-default(role='navigation')
       .container-fluid
         .navbar-header
-          a.navbar-brand(href='#') Kaleidomics
+          a.navbar-brand(href='#') Kale
         div
           ul.nav.navbar-nav.col-lg-2
           ul.nav.navbar-nav.col-lg-8
             form.navbar-form.form-inline(role='search', style='width:90%;')
               #globalSearch.form-search
-                span#globalSearchWarning.label.label-danger.glyphicon.glyphicon-remove(style='margin-right:3px;')
+                span#globalSearchWarning.label.label-danger.glyphicon.glyphicon-remove(style='margin-right:3px;' onclick='hideGlobalSearchWarning();')
                 input#globalSearchForm.form-control(type='search', placeholder='Enter for search', style='width:75%;')
                 button#globalSearchButton.btn.btn-primary(style='margin-left:5px;' type='button' onclick='sendList()') Enter
     .container-fluid
