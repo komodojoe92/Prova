@@ -264,7 +264,6 @@ function hideShowColumnTable(id){
 }
 
 function drawGoogleChart(table, id){
-  //dal server, insieme ai dati viene inviato per ciascun grafico, l'indice dell'elemento di riferimento per l'asse x ed la sottostringa degli elementi da graficare nel chartS
   var keys = Object.keys(dati);
   var tableName = keys[id];
   var hsectionResult_body_tab = calcHeightWindow('#sectionResult_body_tab');
@@ -426,7 +425,7 @@ function setIndexOfHaxisValue(id,filepath){
 
 function setStringOfColumnsChart(id, filepath){
   var stringColumns = $('#selectColumnsForChart_body_columnsForm_'+ id).val();
-  //var stringOfHaxis = $('#selectColumnsForChart_body_haxisForm_'+ id).val();
+
   $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).hide();
 
   if( stringColumns != "" ){
@@ -453,11 +452,21 @@ function setStringOfColumnsChart(id, filepath){
       }
       else{
         $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).show();
+        $('.myIndexColumn').hide();
+        $('.myTable').hide();
+        $('.myChart').hide();
       }
   }
   else{
     $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).show();
-    switchTableChart('sectionResult_header_switchSection_chart');
+    //switchTableChart('sectionResult_header_switchSection_chart');
+    $('.myIndexColumn').hide();
+    $('.myTable').hide();
+    $('.myChart').hide();
   }
 setHeightWindows();
+}
+
+function hideGlobalSearchWarning(){
+  $('#globalSearchWarning').hide();
 }
