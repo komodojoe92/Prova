@@ -1,5 +1,4 @@
 #HOW TO INSTALL
----
 1.	Download Kale’s folder;
 2.	Install nodeJS (We advice you install it to ‘npm’  --> [www.npmjs.com](https://www.npmjs.com))
 3.	Start command promp and get to kale’s folder;
@@ -7,10 +6,7 @@
 5.	Digit ‘npm start’;
 6.	Open ‘localhost:3000’ in  browser.
 
-***
----
 #DOCUMENTATION
----
 Before you start reading this document, we advise the reader to inspect programming languages as JavaScript , jQuery , JSON and basic features of the framework nodeJS , particularly ExpressJS. Also, please read the documentation of the JavaScript’s plug-in: DataTables and Google Chart.
 
 The folder is divided into several sections. Each of which addresses a different aspect of the application.
@@ -50,17 +46,6 @@ A group of variables is delivered to a key, as:
 
 	+ *resetVariableAndDiv()-->* It resets all divisions and variables that are used in the last search.
 	+ *setStringOfKeys(inputValueSplit)-->* It sets the string that will be sent to the server.
-	
-			var stringOfKeys="";
-
-  			$.each(inputValueSplit, function(index,value){
-    		if (value != ""){
-      			stringOfKeys += value + '%20';
-    		}
-  			});
-
-  			stringOfKeys = deleteLastThreeCharacters(stringOfKeys);
-  			return stringOfKeys;
 
 		For all elements in ‘inputValueSplit’, this function controls if it is different from the null character and concatenates them to each other followed by the characters ‘%20’.
 		The result will be sent to ‘deleteLastThreeCharacters(string)’.
