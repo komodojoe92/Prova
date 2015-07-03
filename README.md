@@ -19,6 +19,7 @@ A group of variables is delivered to a key, as:
 	+ _header:_ is composed by a map that represent the title of columns;
 	+ _hAxis:_ represents the index of column that will be used for the horizontal-axis of chart;
 	+ _stringColumns:_ represent the string’s value that will be matched with each name of columns and it will be used to group the result for the chart.
+
 + *node_modules-->* In this folder there are all modules that the application  uses  in its various tasks. For more advice we invite to read documentation of nodeJS.
 + *public/js/ui.js-->* In this file there are all functions (in JavaScript) and libraries that the application uses during execution.
 	+ ```google.load('visualization', '1.1', {packages: ['corechart', 'bar']})``` loads the version 1.1 of the Google’s API named ‘visualization’, with ‘corechart’ and ‘bar’ as optional packages.
