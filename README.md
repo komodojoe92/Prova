@@ -107,7 +107,7 @@ A group of variables is delivered to a key, as:
 
 	+ *hideGlobalSearchWarning()-->* This function hides ‘#globalSearchWarning’.
 + *routes/index.js-->* In this file there is the part of code that initialize the application. This function renders in ‘localhost:3000/’ the structure contained in ‘views/index.jade’.
+
 + *routes/services.js-->* In this file there are a series of function that respond with static examples of JSON file when the client gets a request to the server.
+
 + *view/index.jade-->* In this file there is the basic structure of user interface that is set to the client. When the program is initialized, this file is parsed into an HTML file.
-***
----
