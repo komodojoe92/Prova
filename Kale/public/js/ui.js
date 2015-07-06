@@ -1,6 +1,6 @@
 /*
 OBJECT: in this file there are all functions and libraries that the application uses during execution. There are any parts of code that require knowledge of JQuery and Bootstrap.
-LAST REVISION: 03-07-2015
+LAST REVISION: 06-07-2015
 */
 
 google.load('visualization', '1.1', {packages: ['corechart', 'bar']});  //it loads th versione 1.1 of Google's API named 'visualization' and with 'corechart' and 'bar' as optional packages
