@@ -52,7 +52,7 @@ A group of variables is delivered to a key, as:
 	
 	+ **_createResultTable(table, id) -->_** This function makes the table in ‘#sectionResult\_body\_content\_id’.
 	
-	+ **_createResultChart(table, id) -->_** It makes the division of chart in  ‘#sectionResult\_body\_content_id’.
+	+ **_createDivChart(table, id) -->_** It makes the division of chart in  ‘#sectionResult\_body\_content_id’.
 	
 	+ **_createColumnsSides(table, id) -->_** It makes division in ‘#listingColumns_body’.
 
