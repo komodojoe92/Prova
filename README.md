@@ -35,7 +35,10 @@ A group of variables is delivered to a key, as:
 	
 	+ **_sendiList() -->_** This function reads and controls input string in ‘#globalSearchForm’ and sets values that will be sent to the server.
 
+	+ **_hideGlobalSearchWarning() -->_** This function hides ‘#globalSearchWarning’.
+
 	+ **_resetVariableAndDiv() -->_** It resets all divisions and variables that are used in the last search.
+
 	+ **_setStringOfKeys(inputValueSplit) -->_** It sets the string that will be sent to the server.
 
 	+ **_deleteLastThreeCharacters(string) -->_** It deletes the last three characters in the input string (‘%20’).
@@ -87,8 +90,9 @@ A group of variables is delivered to a key, as:
 	+ **_setIndexOfHaxisValue(id,filepath) -->_** It sets ‘hAxis’ of the current table with the value in ‘#selectColumnsForChart\_body\_haxisForm\_id’.
 
 	+ **_setStringOfColumnsChart(id, filepath) -->_** It controls value in ‘#selectColumnsForChart\_body\_columnsForm\_id’.
+	
+	+ **_showErrorInputColumnsForm(id,filepath) -->_** This function hides all elements of the current result #selectColumnsForChart_body_columnsForm_Warning_id is show and value of 'stringColumns' is set equal to 'null'. 
 
-	+ **_hideGlobalSearchWarning() -->_** This function hides ‘#globalSearchWarning’.
 
 + *routes/index.js -->* In this file there is the part of code that initialize the application. This function renders in ‘localhost:3000/’ the structure contained in ‘views/index.jade’.
 
