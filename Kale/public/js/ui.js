@@ -292,7 +292,7 @@ function createSectionColumnsForChart(table,id){
   $("<p></p><button id=\"selectColumnsForChart_body_enterButton"+ id +"\" class=\"btn btn-primary btn-sm\" type=\"button\" style=\"float:right;\" onclick=\"sendStringsForChart()\">Enter</button>").appendTo('#sectionColumnsForChart_'+ id);
 }
 
-/* THIS FUNCTION HIDES THE ERRORI INPUT'S WARNING IN #sectionColumnsForChart_id */
+/* THIS FUNCTION HIDES THE ERROR INPUT'S WARNING IN #sectionColumnsForChart_id */
 function hideColumnsFormWarning(id){
   $('#'+ id).hide();
   setHeightWindows();
@@ -494,7 +494,6 @@ function sendStringsForChart(){
   
   setIndexOfHaxisValue(index,tableName);
   setStringOfColumnsChart(index,tableName);
-  switchTableChart('#sectionResult_header_switchSection_chart');
 }
 
 /* THIS FUNCTION SETS THE VALUE OF 'hAxis' OF THE CURRENT RESULT */
@@ -548,7 +547,6 @@ setHeightWindows();   //at the end, function recalculates the height of division
 function showErrorInputColumnsForm(id,filepath){
   $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).show();
   dati[filepath]['stringColumns'] = null;
-  $('.myIndexColumn').hide();
   $('.myTable').hide();
   $('.myChart').hide();
 }
