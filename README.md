@@ -61,6 +61,8 @@ A group of variables is delivered to a key, as:
 
 	+ **_createSectionColumnsForChart(table,id) -->_** This function makes a division in ‘#selectColumnsForChart\_body’, where the user can choose how elements are displayed in chart.
 
+	+ **_hideColumnsFormWarning(id) -->_** This function hides the error input's warning in #sectionColumnsForChart_id
+	
 	+ **_showDivOfFirstKey() -->_** This function displays divisions of the first result’s element (‘#indexColumn’,’#sectionColumnForChart’,’#sectionResult\_body\_content\_li’,’#sectionResult\_body\_content’, ‘#sectionResult\_header\_switchSection\_table’) and it calls ‘switchContent("content0")’.
 	
 	+ **_hideShowColumnTable(id) -->_** It is called when user selects a column’s name in ‘ListingColumns’. If the respective table is displayed, the function visualizes or hides the respective column. Otherwise, it calls ‘switchTableChart(id)’.
