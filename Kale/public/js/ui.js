@@ -111,7 +111,12 @@ function sendList(){
   $.getJSON(webserver+stringToServer, function(data){   //the request is sent to server and the function: createResult(tables) is called with results
       createResults(data);
     });
- } 
+ }
+
+/* THIS FUNCTION HIDES #globalSearchWarning*/
+function hideGlobalSearchWarning(){
+  $('#globalSearchWarning').hide();
+}
 
 /* THIS FUNCTION DELETE ALL DIV THAT IS MADE BY LAT SEARCH */
 function resetVariableAndDiv(){
@@ -276,7 +281,8 @@ function createSectionColumnsForChart(table,id){
   /* THE STRUCTURE IS: <input id="selectColumnsForChart_body_columnsForm_id" class="form-control">
                          <span class="class1 class2 class3 class4" id="selectColumnsForChart_body_columnsForm_Warning_id"> ... </span>
                        </input>*/
-  $("<input id=\"selectColumnsForChart_body_columnsForm_"+ id +"\" class=\"form-control\"><span class=\"label label-danger glyphicon glyphicon-remove\" id=\"selectColumnsForChart_body_columnsForm_Warning_"+ id +"\"> inputError.</span></input>").appendTo('#sectionColumnsForChart_'+ id);          
+  $("<input id=\"selectColumnsForChart_body_columnsForm_"+ id +"\" class=\"form-control\"><span class=\"label label-danger glyphicon glyphicon-remove\" id=\"selectColumnsForChart_body_columnsForm_Warning_"+ id +"\" onclick=\"hideColumnsFormWarning(id)\"></span></input>").appendTo('#sectionColumnsForChart_'+ id);          
+  $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).text('inputError.');
   $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).hide();   //hide the error input's string
   $("#selectColumnsForChart_body_columnsForm_"+ id).val(stringColumns);   //it pastes the current value of variable 'stringolumns' of the table in #selectColumnsForChart_body_columnsForm_id
   /* THE STRUCTURE IS: <p></p>
@@ -285,6 +291,13 @@ function createSectionColumnsForChart(table,id){
                        </button> */
   $("<p></p><button id=\"selectColumnsForChart_body_enterButton"+ id +"\" class=\"btn btn-primary btn-sm\" type=\"button\" style=\"float:right;\" onclick=\"sendStringsForChart()\">Enter</button>").appendTo('#sectionColumnsForChart_'+ id);
 }
+
+/* THIS FUNCTION HIDES THE ERRORI INPUT'S WARNING IN #sectionColumnsForChart_id */
+function hideColumnsFormWarning(id){
+  $('#'+ id).hide();
+  setHeightWindows();
+}
+
 /* THIS FUNCTION SHOWS DIVISIONS AND SELECT SECTION OF THE FIRST KEY OF RESULTS */
 function showDivOfFirstKey(){
   $('#indexColumn_0').show();
@@ -481,6 +494,7 @@ function sendStringsForChart(){
   
   setIndexOfHaxisValue(index,tableName);
   setStringOfColumnsChart(index,tableName);
+  switchTableChart('#sectionResult_header_switchSection_chart');
 }
 
 /* THIS FUNCTION SETS THE VALUE OF 'hAxis' OF THE CURRENT RESULT */
@@ -521,22 +535,20 @@ function setStringOfColumnsChart(id, filepath){
         switchTableChart('sectionResult_header_switchSection_chart');
       }
       else{   //else error input's string is show and all elements is hide
-        $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).show();
-        $('.myIndexColumn').hide();
-        $('.myTable').hide();
-        $('.myChart').hide();
+        showErrorInputColumnsForm(id,filepath);
       }
   }
   else{   //else error input's string is show and all elements is hide
-    $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).show();
-    $('.myIndexColumn').hide();
-    $('.myTable').hide();
-    $('.myChart').hide();
+    showErrorInputColumnsForm(id,filepath);
   }
 setHeightWindows();   //at the end, function recalculates the height of divisions
 }
 
-/* THIS FUNCTION HIDES #globalSearchWarning*/
-function hideGlobalSearchWarning(){
-  $('#globalSearchWarning').hide();
+/* THIS FUNCTION HIDES ALL ELEMENTS OF THE CURRENT RESULT, #selectColumnsForChart_body_columnsForm_Warning_id IS SHOW AND VALUE OF 'stringColumns' IS SET EQUAL TO 'null' */
+function showErrorInputColumnsForm(id,filepath){
+  $('#selectColumnsForChart_body_columnsForm_Warning_'+ id).show();
+  dati[filepath]['stringColumns'] = null;
+  $('.myIndexColumn').hide();
+  $('.myTable').hide();
+  $('.myChart').hide();
 }
