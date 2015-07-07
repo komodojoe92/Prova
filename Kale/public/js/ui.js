@@ -1,6 +1,6 @@
 /*
 OBJECT: in this file there are all functions and libraries that the application uses during execution. There are any parts of code that require knowledge of JQuery and Bootstrap.
-LAST REVISION: 06-07-2015
+LAST REVISION: 03-07-2015
 */
 
 google.load('visualization', '1.1', {packages: ['corechart', 'bar']});  //it loads th versione 1.1 of Google's API named 'visualization' and with 'corechart' and 'bar' as optional packages
@@ -152,6 +152,7 @@ function createResults(tables){
   if(keys.length == 0){   //if there aren't results an error string is made in #sectionResult_body and the execution ends.
     //console.log(keys.length);
     $("<p id=\"emptyResultWarning\"class=\"text-danger\">*No result! Please, retry with other params.</p>").appendTo('#sectionResult_body');
+    $('a[href="#Result"]').tab('show');   //it displays Result's section
     return;
   }
   /* for each key a series of functions are called for display result */
