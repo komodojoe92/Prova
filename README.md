@@ -19,7 +19,7 @@ A group of variables is delivered to a key, as:
 	+ _data:_ is composed by arrays that represent the rows of the table;
 	+ _header:_ is composed by a map that represent the title of columns;
 	+ _headerString:_ is composed by headers that have 'String' as values;
-	+ _headerNumeri:_ is composed by headers that have 'Numeric' as values;
+	+ _headerNumeric:_ is composed by headers that have 'Numeric' as values;
 	+ _hAxis:_ represents the index of column that will be used for the horizontal-axis of chart;
 	+ _stringColumns:_ represent the string’s value that will be matched with each name of columns and it will be used to group the result for the chart.
 	
