@@ -1,6 +1,6 @@
 /*
 OBJECT: in this file there are all functions and libraries that the application uses during execution. There are any parts of code that require knowledge of JQuery and Bootstrap.
-LAST REVISION: 07-07-2015
+LAST REVISION: 08-07-2015
 */
 
 google.load('visualization', '1.1', {packages: ['corechart', 'bar']});  //it loads th versione 1.1 of Google's API named 'visualization' and with 'corechart' and 'bar' as optional packages
@@ -155,7 +155,6 @@ function createResults(tables){
   var keys = Object.keys(tables);   //it gets all keys of result
   
   if(keys.length == 0){   //if there aren't results an error string is made in #sectionResult_body and the execution ends.
-    //console.log(keys.length);
     $("<p id=\"emptyResultWarning\"class=\"text-danger\">*No result! Please, retry with other params.</p>").appendTo('#sectionResult_body');
     $('a[href="#Result"]').tab('show');   //it displays Result's section
     return;
@@ -260,7 +259,7 @@ function createColumnsSides(table, id){
 function createSectionColumnsForChart(table,id){
   var keys = Object.keys(dati);
   var tableName = keys[id];
-  var headers = dati[tableName]['header'];
+  var headers = dati[tableName]['headerString'];
   var stringColumns = dati[tableName]['stringColumns']
   /* THE STRUCTURE IS: <div id="sectionColumnsForChart_id" class="mySectionColumnsForChart"> </div>*/
   $("<div id=\"sectionColumnsForChart_"+ id +"\" class=\"mySectionColumnsForChart\"></div>").appendTo('#selectColumnsForChart_body');
@@ -270,11 +269,7 @@ function createSectionColumnsForChart(table,id){
   $("<select id=\"selectColumnsForChart_body_haxisForm_"+ id +"\" class=\"form-control\"></select>").appendTo('#sectionColumnsForChart_'+ id);
 
   $.each(headers, function(index,value){    //it controls for each element if value is a string different from "OK" and "-" and it makes a new option value in #sectionColumnsForChart_body_haxisForm_id
-    var dataElement = table['data'][0][index];    //the first row of the table
-    var elementNumeric = Number(dataElement);
-    if( isNaN(elementNumeric) && dataElement!="OK" && dataElement!="-"){    //elements must be string different from "OK" and "-"
       $("<option>"+ value +"</option>").appendTo('#selectColumnsForChart_body_haxisForm_'+ id);
-    }
   });
   /* THE STRUCTURE IS: <label for="selectColumnsForChart_body_columnsForm_id;" style="height:5px;"> ... </label> */
   $("<label for=\"selectColumnsForChart_body_columnsForm_"+ id +";\" style=\"height:5px;\">matchingString</label>").appendTo('#sectionColumnsForChart_'+ id);
@@ -513,17 +508,13 @@ function setStringOfColumnsChart(id, filepath){
 
   if( stringColumns != "" ){  //if the form isn't empty the code controls if input string is at least in one of the column's value of the current table
       var matched = false;
-      var headers = dati[filepath]['header'];
-      var data = dati[filepath]['data'];
-      var firstRowData = data[0];
+      var headers = dati[filepath]['headerNumeric'];
       stringColumns = stringColumns.split(" ")[0];
 
       $.each(headers, function(index,value){    //for each column of the table, it searches if the value is present and if its respective value in the first row is a number
         var indexMatched = value.search(stringColumns);
-        var firstRowDataIndexElement = firstRowData[index];
-        var firstRowDataIndexElementNumeric = Number(firstRowDataIndexElement);
 
-        if((indexMatched != -1) && !(isNaN(firstRowDataIndexElementNumeric)) ){
+        if((indexMatched != -1) ){
           matched = true;
           return;
         }
