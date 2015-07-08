@@ -3,3 +3,4 @@
 * Charts: reorder the population from the main chart
   [link:] (http://stackoverflow.com/questions/15443931/sorting-data-on-x-axis-in-google-line-chart)
 * Remember the selection for the user (cookies)
+* Input pressing enter from the keyboard the system must submit the query, similar to clicking on the button "Enter"
