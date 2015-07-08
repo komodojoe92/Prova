@@ -3,13 +3,14 @@ OBJECT: in this file there are all functions and libraries that the application 
 LAST REVISION: 08-07-2015
 */
 
-google.load('visualization', '1.1', {packages: ['corechart', 'bar']});  //it loads th versione 1.1 of Google's API named 'visualization' and with 'corechart' and 'bar' as optional packages
-/*global variables ---DON'T DELATE!---*/
+google.load('visualization', '1.1', {packages: ['corechart', 'bar']});  //it loads the versione 1.1 of Google's API named 'visualization' and with 'corechart' and 'bar' as optional packages
+/*global variables ---DON'T DELETE!---*/
 var tagList = [];   //this varibale contains tags that are selected
 var dati;   //will be used to keep in memory server's result
 
 /* When HTML page is loaded, the programme makes buttons of tags */
 $(document).ready(function() {
+
   setHeightWindows();
   $.getJSON(webserver +'/tags', function(data){   //require to the server an array with tag's name
     $.each(data, function(index,value){
@@ -53,14 +54,14 @@ function selectionTag(id){
   var indexOfTagName = tagList.indexOf(id);   //it controls if 'id' is in tagList (an array) and returns it index
 
   if (indexOfTagName == -1){  //if index there isn't (value equal to -1) button's background become GREEN, 'id' is added to array (tagList) and a new row displays in #selectedTag_body_table_body
-    document.getElementById(id).style.background="#ADFF2F";
+    $('#'+ id).css("background-color", "#ADFF2F");
     tagList.push(id);
     /* THE STRUCTURE IS: <tr id="line_id"><td> id </td><td><div class="class1 class2 class3" id="deleteBtn/id" onclick="deleteTag(id)"> X </td><tr> 
        'tr' can be interpreted as 'row' and 'td' as 'division/column' */
     $("<tr id=\"line_"+ id +"\"><td>" + id + "</td><td><div class=\"btn btn-xs btn-danger\" id=\"deleteBtn/" + id +"\" onclick=\"deleteTag(id)\">X</div></td></tr>").appendTo('#selectedTag_body_table_body');
   }
   else{   //else if 'id' is in tagList, the code simulates a call from a tag's button
-    var idForDeleteTag = "/"+ id;
+    var idForDeleteTag = "deleteBtn/"+ id;
     deleteTag(idForDeleteTag);
   }
 }
@@ -160,8 +161,7 @@ function createResults(tables){
     return;
   }
   /* for each key a series of functions are called for display result */
-  $.each(keys, function(index,value){
-    var tableName = keys[index];  //keys[index] correspondes to filepath of table
+  $.each(keys, function(index,tableName){
     var dataTable = tableToDataTable(tables[tableName]);  //it makes result for DataTable() from the structure of result that is sent by the server
     
     createResultTab(index, index);    //it  makes a new TAB for the table
@@ -226,7 +226,7 @@ function createResultTable(table, id){
   /* THE STRUCTURE IS: <div id="table_id" class="myTable" style="overflow:auto; height:100%"> </div> */
   $("<div id=\"table_"+id+"\" class=\"myTable\" style=\"overfloaw:auto ; height:100%\"></div>").appendTo('#sectionResult_body_content_'+ id);
   /* THE STRUCTURE IS: <table border="3" class="class1 class2 class3" id="exampleid"> </table> */
-  $("<table border=\"3\" class=\"table table-striped table-condensed\" id=\"example"+ id +"\"></table>").appendTo('#table_'+ id);
+  $("<table border=\"3\" class=\"table table-striped table-condensed\" id=\"example"+ id +"\" style='width: 100%;'></table>").appendTo('#table_'+ id);
   $('#example'+ id).dataTable(table);   //table is made with the structure that dataTable() wants in input. This line sends it and the response is put in "exampleid".
   //For more information please read the documentation of dataTable()
 }
